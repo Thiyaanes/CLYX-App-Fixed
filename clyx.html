@@ -1,0 +1,2594 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8"/>
+<meta name="viewport" content="width=device-width,initial-scale=1.0"/>
+<title>CLYX</title>
+<link rel="preconnect" href="https://fonts.googleapis.com"/>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600&family=Outfit:wght@600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet"/>
+<style>
+:root{
+  --bg:#080808;--s1:#0f0f0f;--s2:#181818;--s3:#202020;--s4:#2a2a2a;--s5:#363636;
+  --or:#f05a00;--orl:#ff7530;--ord:#c44600;
+  --o08:rgba(240,90,0,.08);--o15:rgba(240,90,0,.15);--o30:rgba(240,90,0,.30);
+  --w:#fff;--w80:rgba(255,255,255,.80);--w50:rgba(255,255,255,.50);
+  --w20:rgba(255,255,255,.20);--w10:rgba(255,255,255,.10);--w06:rgba(255,255,255,.06);--w03:rgba(255,255,255,.03);
+  --gr:#22c55e;--re:#ef4444;--bl:#3b82f6;--pu:#a855f7;--ye:#eab308;
+  --ln:rgba(255,255,255,.07);
+  --f:'Inter',sans-serif;--fd:'Outfit',sans-serif;--fm:'JetBrains Mono',monospace;
+  --ease:cubic-bezier(.22,1,.36,1);
+}
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+html,body{width:100%;height:100%;overflow:hidden;background:var(--bg);color:var(--w);font-family:var(--f);-webkit-font-smoothing:antialiased}
+button{cursor:pointer;border:none;background:none;font-family:inherit;color:inherit;outline:none}
+input{font-family:inherit;color:inherit;outline:none;background:none;border:none}
+::-webkit-scrollbar{width:3px;height:3px}
+::-webkit-scrollbar-thumb{background:var(--s5);border-radius:3px}
+
+/* ══ LOADING ══════════════════════════════════════════════════════════════════ */
+#ld{position:fixed;inset:0;z-index:9900;background:var(--bg);display:flex;align-items:center;justify-content:center;flex-direction:column;gap:28px;transition:opacity .6s,visibility .6s}
+#ld.gone{opacity:0;visibility:hidden}
+.ld-logo-mark{width:100px;height:100px;margin-bottom:4px}
+.ld-word{display:flex;align-items:baseline;gap:1px}
+.ld-l{font-family:var(--fd);font-size:52px;font-weight:800;opacity:0;transform:translateY(16px);animation:ldUp .45s var(--ease) forwards;letter-spacing:-.02em}
+.ld-l:nth-child(1){animation-delay:.05s}
+.ld-l:nth-child(2){animation-delay:.12s}
+.ld-l:nth-child(3){animation-delay:.19s;color:var(--or)}
+.ld-l:nth-child(4){animation-delay:.26s}
+@keyframes ldUp{to{opacity:1;transform:none}}
+.ld-tagline{font-size:11px;letter-spacing:.22em;color:var(--w20);text-transform:uppercase;opacity:0;animation:fdIn .4s .15s ease forwards}
+@keyframes fdIn{to{opacity:1}}
+.ld-bar-wrap{width:140px;height:1px;background:var(--s4);border-radius:1px;overflow:hidden}
+.ld-bar-fill{height:100%;background:linear-gradient(90deg,var(--ord),var(--or),var(--orl));animation:ldFill 1.8s ease forwards}
+@keyframes ldFill{from{width:0}to{width:100%}}
+
+/* ══ AUTH ═══════════════════════════════════════════════════════════════════ */
+#auth{position:fixed;inset:0;z-index:900;display:flex;background:var(--bg);transition:opacity .4s,visibility .4s}
+#auth.gone{opacity:0;visibility:hidden;pointer-events:none}
+.a-left{flex:1;display:flex;align-items:center;justify-content:center;padding:48px;position:relative;overflow:hidden}
+.a-left::before{content:'';position:absolute;width:560px;height:560px;border-radius:50%;background:radial-gradient(circle,rgba(240,90,0,.12) 0%,transparent 68%);top:50%;left:50%;transform:translate(-50%,-50%)}
+.a-left-content{position:relative;z-index:1;text-align:center}
+.a-left-logo{width:88px;height:88px;margin:0 auto 22px;position:relative}
+.a-left-logo svg{width:100%;height:100%}
+.a-left-content h1{font-family:var(--fd);font-size:44px;font-weight:800;letter-spacing:-.03em;margin-bottom:14px;line-height:1}
+.a-left-content h1 .y-plain{color:var(--w)}
+.a-left-content h1 .x-glow{color:var(--or);text-shadow:0 0 32px rgba(240,90,0,.7),0 0 64px rgba(240,90,0,.35)}
+.a-left-content p{font-size:14px;color:var(--w50);line-height:1.75;max-width:290px;margin:0 auto}
+.a-right{width:440px;flex-shrink:0;background:var(--s1);border-left:1px solid var(--ln);display:flex;flex-direction:column;align-items:center;justify-content:center;padding:52px 44px}
+.a-right h2{font-family:var(--fd);font-size:24px;font-weight:700;margin-bottom:5px;letter-spacing:-.02em}
+.a-sub{font-size:12px;color:var(--w20);margin-bottom:34px;letter-spacing:.02em}
+.seg{display:flex;background:var(--s2);border-radius:10px;padding:3px;margin-bottom:30px;width:100%}
+.seg-b{flex:1;padding:8px;border-radius:8px;font-size:13px;font-weight:500;color:var(--w20);transition:all .2s;text-align:center}
+.seg-b.on{background:var(--s4);color:var(--w)}
+.fld{margin-bottom:15px;width:100%}
+.fld label{display:block;font-size:11px;font-weight:500;letter-spacing:.1em;text-transform:uppercase;color:var(--w20);margin-bottom:7px}
+.fld input{width:100%;padding:11px 14px;background:var(--s2);border:1px solid var(--ln);border-radius:9px;font-size:13px;color:var(--w);transition:border-color .2s}
+.fld input:focus{border-color:var(--or)}
+.fld input::placeholder{color:var(--s5)}
+.btn-main{width:100%;padding:12px;background:var(--or);border-radius:9px;font-family:var(--fd);font-size:14px;font-weight:700;color:var(--w);letter-spacing:.04em;transition:all .2s;margin-top:4px;box-shadow:0 4px 20px var(--o15)}
+.btn-main:hover{background:var(--orl);box-shadow:0 6px 28px var(--o30);transform:translateY(-1px)}
+.dvd{display:flex;align-items:center;gap:10px;margin:20px 0;color:var(--w20);font-size:11px;width:100%}
+.dvd::before,.dvd::after{content:'';flex:1;height:1px;background:var(--ln)}
+.btn-g{width:100%;padding:11px 14px;background:var(--s2);border:1px solid var(--ln);border-radius:9px;font-size:13px;color:var(--w50);display:flex;align-items:center;justify-content:center;gap:9px;transition:all .2s}
+.btn-g:hover{border-color:var(--w10);color:var(--w);background:var(--s3)}
+.a-note{font-size:11px;color:var(--w20);text-align:center;margin-top:18px;line-height:1.65}
+
+/* ══ SHELL ═══════════════════════════════════════════════════════════════════ */
+#app{position:fixed;inset:0;z-index:800;display:flex;flex-direction:column;transition:opacity .3s,visibility .3s}
+#app.gone{opacity:0;visibility:hidden;pointer-events:none}
+
+/* ══ TOPBAR ══════════════════════════════════════════════════════════════════ */
+.tb{height:52px;background:var(--s1);border-bottom:1px solid var(--ln);display:flex;align-items:center;padding:0 18px;gap:10px;flex-shrink:0;z-index:300;position:relative}
+.tb-brand{display:flex;align-items:center;gap:9px;cursor:pointer;padding:5px 9px;border-radius:9px;transition:background .15s;flex-shrink:0}
+.tb-brand:hover{background:var(--w06)}
+.tb-lm{width:28px;height:28px;flex-shrink:0;position:relative}
+.tb-lm svg{width:100%;height:100%}
+.tb-name{font-family:var(--fd);font-size:16px;font-weight:800;letter-spacing:.06em}
+.tb-sep{width:1px;height:22px;background:var(--ln);flex-shrink:0;margin:0 2px}
+.tab-scroll{flex:1;display:flex;align-items:center;gap:3px;overflow-x:auto;scrollbar-width:none;min-width:0}
+.tab-scroll::-webkit-scrollbar{display:none}
+.tab{display:flex;align-items:center;gap:6px;padding:5px 11px;height:32px;background:var(--s2);border:1px solid transparent;border-radius:8px;font-size:12px;font-weight:400;color:var(--w20);cursor:pointer;white-space:nowrap;transition:all .15s;flex-shrink:0;max-width:148px}
+.tab:hover:not(.on){background:var(--s3);color:var(--w50)}
+.tab.on{background:var(--s2);border-color:rgba(240,90,0,.25);color:var(--w)}
+.tab-dot{width:5px;height:5px;border-radius:50%;background:var(--s5);flex-shrink:0;transition:background .2s}
+.tab.on .tab-dot{background:var(--or)}
+.tab-ico{width:13px;height:13px;object-fit:contain;flex-shrink:0;border-radius:2px}
+.tab-lbl{overflow:hidden;text-overflow:ellipsis;max-width:82px}
+.tab-x{width:14px;height:14px;border-radius:3px;display:flex;align-items:center;justify-content:center;font-size:9px;color:var(--w20);flex-shrink:0;transition:all .15s;margin-left:2px}
+.tab-x:hover{background:var(--re);color:#fff}
+.tab-add{width:32px;height:32px;border-radius:8px;border:1px dashed var(--s5);display:flex;align-items:center;justify-content:center;color:var(--w20);flex-shrink:0;transition:all .2s;font-size:16px}
+.tab-add:hover{border-color:var(--or);color:var(--or);background:var(--o08)}
+.tb-right{display:flex;align-items:center;gap:7px;flex-shrink:0;position:relative}
+.ib{width:32px;height:32px;border-radius:8px;background:var(--s2);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;transition:all .15s}
+.ib:hover{background:var(--s3);border-color:var(--w10)}
+.ib svg{width:15px;height:15px;stroke:var(--w50);transition:stroke .15s}
+.ib:hover svg{stroke:var(--w)}
+/* Avatar */
+.av-wrap{position:relative}
+.av{width:30px;height:30px;border-radius:50%;background:linear-gradient(135deg,var(--ord),var(--orl));display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:13px;font-weight:700;cursor:pointer;transition:all .2s;border:2px solid transparent}
+.av:hover,.av.open{border-color:var(--or);box-shadow:0 0 0 3px var(--o15)}
+.av-menu{position:absolute;top:calc(100% + 9px);right:0;width:220px;background:var(--s1);border:1px solid var(--ln);border-radius:13px;padding:6px;box-shadow:0 20px 50px rgba(0,0,0,.7);z-index:1000;opacity:0;visibility:hidden;transform:translateY(-6px) scale(.97);transition:all .22s var(--ease)}
+.av-menu.open{opacity:1;visibility:visible;transform:none}
+.av-mhead{padding:11px 11px 10px;border-bottom:1px solid var(--ln);margin-bottom:4px}
+.av-mname{font-weight:600;font-size:13px}
+.av-memail{font-size:11px;color:var(--w20);margin-top:2px}
+.av-item{display:flex;align-items:center;gap:10px;padding:9px 11px;border-radius:9px;font-size:13px;color:var(--w50);cursor:pointer;transition:all .15s}
+.av-item:hover{background:var(--w06);color:var(--w)}
+.av-item svg{width:14px;height:14px;flex-shrink:0;opacity:.7;stroke:currentColor}
+.av-item:hover svg{opacity:1}
+.av-item.danger{color:var(--re)}
+.av-item.danger:hover{background:rgba(239,68,68,.1)}
+.av-div{height:1px;background:var(--ln);margin:4px 0}
+
+/* ══ CONTENT ═════════════════════════════════════════════════════════════════ */
+.content{flex:1;overflow:hidden;position:relative}
+.view{position:absolute;inset:0;transition:opacity .22s,transform .22s}
+.view.gone{opacity:0;pointer-events:none;transform:scale(.99) translateY(3px)}
+
+/* ══ DASHBOARD ═══════════════════════════════════════════════════════════════ */
+#dash{overflow-y:auto;padding:36px 40px}
+
+/* Greeting */
+.dash-greet{margin-bottom:28px}
+.dash-greet-top{display:flex;align-items:flex-start;justify-content:space-between;gap:16px;flex-wrap:wrap}
+.dash-greet-text h2{font-family:var(--fd);font-size:30px;font-weight:800;letter-spacing:-.02em;margin-bottom:5px;line-height:1.1}
+.dash-greet-text h2 em{color:var(--or);font-style:normal}
+.dash-greet-text p{font-size:14px;color:var(--w50);line-height:1.5}
+.sync-pill{display:flex;align-items:center;gap:8px;padding:9px 15px;background:var(--s1);border:1px solid rgba(240,90,0,.35);border-radius:30px;font-size:12px;color:rgba(255,255,255,.85);flex-shrink:0;cursor:pointer;transition:all .18s;white-space:nowrap;box-shadow:0 0 14px rgba(240,90,0,.12)}
+.sync-pill:hover{border-color:rgba(240,90,0,.6);background:var(--s2);color:var(--w);box-shadow:0 0 20px rgba(240,90,0,.2)}
+.sync-pulse{width:7px;height:7px;border-radius:50%;background:var(--or);box-shadow:0 0 8px var(--or);animation:pulse 2.2s ease-in-out infinite;flex-shrink:0}
+@keyframes pulse{0%,100%{opacity:1}50%{opacity:.3}}
+
+/* Metrics */
+.metrics{display:grid;grid-template-columns:repeat(3,1fr);gap:12px;margin-top:24px;margin-bottom:32px}
+.metric{background:var(--s1);border:1px solid var(--ln);border-radius:16px;padding:22px 20px 20px;position:relative;overflow:hidden;transition:all .22s}
+.metric::before{content:'';position:absolute;inset:0 0 auto 0;height:1px;background:linear-gradient(90deg,transparent,rgba(255,255,255,.1),transparent)}
+.metric:hover{border-color:rgba(240,90,0,.3);transform:translateY(-2px);box-shadow:0 8px 28px rgba(0,0,0,.35)}
+.metric-top{height:0;margin-bottom:0}
+.metric-icon-pill{width:40px;height:40px;border-radius:11px;display:flex;align-items:center;justify-content:center;flex-shrink:0;position:absolute;top:18px;right:18px}
+.metric-icon-pill svg{width:20px;height:20px;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.metric-val{font-family:var(--fm);font-size:36px;font-weight:600;color:var(--w);line-height:1;letter-spacing:-.04em}
+.metric-lbl{font-size:11px;font-weight:500;letter-spacing:.08em;text-transform:uppercase;margin-top:6px}
+.metric-app-logos{display:flex;align-items:center;gap:5px;margin-top:12px;flex-wrap:wrap}
+.metric-app-logo{width:22px;height:22px;border-radius:6px;overflow:hidden;background:var(--s3);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.metric-app-logo img{width:18px;height:18px;object-fit:contain}
+.metric-app-logo-more{width:22px;height:22px;border-radius:6px;background:var(--s3);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;font-size:9px;font-weight:600;color:rgba(255,255,255,.4);flex-shrink:0;letter-spacing:-.02em}
+.metric-device-list{display:flex;flex-direction:column;gap:5px;margin-top:12px}
+.metric-dev-item{display:flex;align-items:center;gap:6px;font-size:11px;color:rgba(255,255,255,.5)}
+.metric-dev-item svg{width:13px;height:13px;flex-shrink:0}
+.metric-dev-item span{flex:1}
+.mdev-dot{width:6px;height:6px;border-radius:50%;background:var(--s4);flex-shrink:0}
+.mdev-dot.active{background:var(--or);box-shadow:0 0 6px var(--or)}
+
+/* Status bar */
+.status-bar{display:flex;align-items:center;gap:16px;padding:11px 16px;background:var(--s1);border:1px solid var(--ln);border-radius:12px;margin-bottom:32px;flex-wrap:wrap}
+.sb-item{display:flex;align-items:center;gap:7px;font-size:12px;color:rgba(255,255,255,.65);font-weight:400}
+.sb-dot{width:7px;height:7px;border-radius:50%;flex-shrink:0}
+.sb-sep{width:1px;height:14px;background:rgba(255,255,255,.12)}
+
+/* Section */
+.sec-row{display:flex;align-items:center;justify-content:space-between;margin-bottom:16px}
+.sec-title{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:rgba(255,255,255,.5)}
+.sec-link{font-size:12px;color:var(--or);cursor:pointer;transition:opacity .15s;font-weight:500}
+.sec-link:hover{opacity:.7}
+.sec-sub{font-size:12px;color:rgba(255,255,255,.35);margin:-10px 0 16px}
+
+/* App Grid */
+.apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:10px}
+.acard{background:var(--s1);border:1px solid var(--ln);border-radius:14px;padding:20px 12px 16px;display:flex;flex-direction:column;align-items:center;gap:11px;cursor:pointer;transition:all .22s var(--ease);position:relative;overflow:hidden}
+.acard::after{content:'';position:absolute;inset:0;background:linear-gradient(160deg,var(--o08),transparent 55%);opacity:0;transition:opacity .22s;border-radius:inherit}
+.acard:hover{background:var(--s2);border-color:rgba(240,90,0,.22);transform:translateY(-3px);box-shadow:0 12px 32px rgba(0,0,0,.5)}
+.acard:hover::after{opacity:1}
+.acard-logo{width:44px;height:44px;display:flex;align-items:center;justify-content:center;position:relative;z-index:1}
+.acard-logo img{width:44px;height:44px;object-fit:contain;filter:drop-shadow(0 2px 8px rgba(0,0,0,.5))}
+.acard-name{font-size:12px;font-weight:500;text-align:center;color:rgba(255,255,255,.75);transition:color .2s;line-height:1.2;position:relative;z-index:1}
+.acard:hover .acard-name{color:var(--w)}
+.acard-online{position:absolute;top:10px;left:10px;width:7px;height:7px;border-radius:50%;background:var(--or);box-shadow:0 0 8px var(--or)}
+.acard-rm{position:absolute;top:6px;right:6px;width:22px;height:22px;border-radius:6px;display:flex;align-items:center;justify-content:center;opacity:0;transition:all .15s;background:transparent;z-index:5;border:none;cursor:pointer}
+.acard:hover .acard-rm{opacity:1;background:rgba(239,68,68,.15)}
+.acard-rm:hover{background:var(--re)!important}
+.acard-rm svg{width:9px;height:9px;stroke:var(--re);pointer-events:none;transition:stroke .1s}
+.acard-rm:hover svg{stroke:#fff}
+.add-card{background:transparent;border:1px dashed var(--s4);border-radius:14px;padding:20px 12px;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:9px;cursor:pointer;min-height:116px;transition:all .2s}
+.add-card:hover{border-color:var(--or);background:var(--o08)}
+.add-card-ring{width:32px;height:32px;border-radius:50%;border:1.5px dashed var(--s5);display:flex;align-items:center;justify-content:center;transition:all .2s}
+.add-card:hover .add-card-ring{border-color:var(--or)}
+.add-card-ring svg{width:14px;height:14px;stroke:var(--w20);transition:stroke .2s}
+.add-card:hover .add-card-ring svg{stroke:var(--or)}
+.add-card span{font-size:10px;color:var(--w20);text-transform:uppercase;letter-spacing:.1em;transition:color .2s;font-weight:500}
+.add-card:hover span{color:var(--or)}
+
+/* ══ APP VIEW ════════════════════════════════════════════════════════════════ */
+#appview{display:flex;flex-direction:column}
+.av-nav{height:40px;background:var(--s1);border-bottom:1px solid var(--ln);display:flex;align-items:center;padding:0 14px;gap:7px;flex-shrink:0}
+.navb{width:26px;height:26px;border-radius:7px;background:var(--s2);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;font-size:12px;color:var(--w20);transition:all .15s}
+.navb:hover{background:var(--s3);color:var(--w)}
+.url-bar{flex:1;padding:5px 11px;background:var(--s2);border:1px solid var(--ln);border-radius:8px;font-size:12px;color:var(--w20);display:flex;align-items:center;gap:7px}
+.url-bar svg{width:10px;height:10px;stroke:var(--gr);flex-shrink:0}
+.av-body{flex:1;overflow:hidden;position:relative}
+.app-mock{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:18px}
+.am-logo{width:64px;height:64px;display:flex;align-items:center;justify-content:center}
+.am-logo img{width:100%;height:100%;object-fit:contain;filter:drop-shadow(0 4px 16px rgba(0,0,0,.6))}
+.am-name{font-family:var(--fd);font-size:20px;font-weight:700;letter-spacing:-.01em}
+.am-badge{padding:5px 14px;border-radius:20px;background:rgba(240,90,0,.1);border:1px solid rgba(240,90,0,.25);font-size:11px;font-weight:500;color:var(--orl);letter-spacing:.06em;text-transform:uppercase}
+.am-desc{font-size:13px;color:var(--w20);text-align:center;max-width:320px;line-height:1.7}
+.am-btn{padding:10px 26px;background:var(--or);border-radius:9px;font-family:var(--fd);font-size:13px;font-weight:700;color:var(--w);letter-spacing:.04em;transition:all .2s;box-shadow:0 4px 16px var(--o15)}
+.am-btn:hover{background:var(--orl);transform:translateY(-1px)}
+
+/* ══ CATALOG MODAL ═══════════════════════════════════════════════════════════ */
+.overlay{position:fixed;inset:0;z-index:7000;background:rgba(0,0,0,.82);backdrop-filter:blur(10px);display:flex;align-items:center;justify-content:center;transition:opacity .2s,visibility .2s}
+.overlay.gone{opacity:0;visibility:hidden;pointer-events:none}
+.modal{width:660px;max-width:96vw;max-height:84vh;background:var(--s1);border:1px solid var(--ln);border-radius:18px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.8);animation:mIn .25s var(--ease)}
+@keyframes mIn{from{opacity:0;transform:translateY(14px) scale(.97)}to{opacity:1;transform:none}}
+.mh{padding:18px 22px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:11px}
+.mh h3{font-family:var(--fd);font-size:16px;font-weight:700;flex:1;letter-spacing:-.01em}
+.m-search{flex:1;padding:8px 13px;background:var(--s2);border:1px solid var(--ln);border-radius:9px;font-size:13px;color:var(--w);transition:border-color .2s}
+.m-search:focus{border-color:var(--or)}
+.m-search::placeholder{color:var(--s5)}
+.m-x{width:30px;height:30px;border-radius:8px;background:var(--s2);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--w20);transition:all .15s}
+.m-x:hover{background:var(--re);border-color:var(--re);color:#fff}
+.mb{flex:1;overflow-y:auto;padding:18px 22px}
+.fchips{display:flex;gap:6px;flex-wrap:wrap;margin-bottom:18px}
+.fchip{padding:5px 13px;border-radius:20px;border:1px solid var(--ln);background:transparent;font-size:12px;color:var(--w20);cursor:pointer;transition:all .15s}
+.fchip.on{border-color:rgba(240,90,0,.4);background:var(--o08);color:var(--or)}
+.cat-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(115px,1fr));gap:9px}
+.ci{background:var(--s2);border:1px solid var(--ln);border-radius:11px;padding:14px 10px;display:flex;flex-direction:column;align-items:center;gap:8px;cursor:pointer;transition:all .18s;position:relative}
+.ci:hover{border-color:var(--w10);background:var(--s3);transform:translateY(-2px);box-shadow:0 8px 24px rgba(0,0,0,.4)}
+.ci.ins{border-color:rgba(240,90,0,.2);background:rgba(240,90,0,.03)}
+.ci-logo{width:40px;height:40px;display:flex;align-items:center;justify-content:center}
+.ci-logo img{width:100%;height:100%;object-fit:contain}
+.ci-name{font-size:11px;font-weight:500;text-align:center;color:var(--w50);letter-spacing:.01em}
+.ci-cat{font-size:10px;color:var(--w20);text-transform:uppercase;letter-spacing:.07em;text-align:center}
+.ci-ck{position:absolute;top:5px;right:5px;width:16px;height:16px;border-radius:50%;background:var(--or);display:flex;align-items:center;justify-content:center;font-size:8px;font-weight:700;color:#fff}
+.ci-btn{width:100%;padding:6px;background:var(--o08);border:1px solid rgba(240,90,0,.25);border-radius:7px;font-size:11px;font-weight:600;letter-spacing:.06em;color:var(--or);text-transform:uppercase;transition:all .15s}
+.ci-btn:hover{background:var(--or);color:#fff;border-color:var(--or)}
+.ci-btn.ib2{background:rgba(240,90,0,.08);border-color:rgba(240,90,0,.25);color:var(--orl)}
+.ci-btn.ib2:hover{background:var(--or);color:#fff}
+
+/* ══ SETTINGS PANEL ══════════════════════════════════════════════════════════ */
+#sp-ov{position:fixed;inset:0;z-index:5000;background:rgba(0,0,0,.52);opacity:0;visibility:hidden;transition:all .3s;backdrop-filter:blur(4px)}
+#sp-ov.open{opacity:1;visibility:visible}
+#sp{position:fixed;top:0;right:0;bottom:0;width:330px;z-index:5100;background:var(--s1);border-left:1px solid var(--ln);display:flex;flex-direction:column;transform:translateX(100%);transition:transform .3s var(--ease);box-shadow:-28px 0 72px rgba(0,0,0,.6)}
+#sp.open{transform:translateX(0)}
+.sp-head{height:52px;border-bottom:1px solid var(--ln);display:flex;align-items:center;padding:0 18px;flex-shrink:0}
+.sp-head h3{font-family:var(--fd);font-size:14px;font-weight:700;flex:1;letter-spacing:.08em;text-transform:uppercase;color:var(--w50)}
+.sp-cls{width:28px;height:28px;border-radius:7px;display:flex;align-items:center;justify-content:center;transition:all .15s}
+.sp-cls:hover{background:var(--s3)}
+.sp-cls svg{width:14px;height:14px;stroke:var(--w20)}
+.sp-body{flex:1;overflow-y:auto;padding:10px}
+/* Accordion */
+.acc{border:1px solid var(--ln);border-radius:11px;margin-bottom:7px;overflow:hidden;transition:border-color .2s}
+.acc.open{border-color:rgba(240,90,0,.2)}
+.acc-h{display:flex;align-items:center;gap:10px;padding:13px 14px;cursor:pointer;transition:background .15s;user-select:none}
+.acc-h:hover{background:var(--w03)}
+.acc-ico{width:30px;height:30px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.acc.open .acc-ico{background:var(--o08)}
+.acc-ico svg{width:15px;height:15px;stroke:var(--w50);transition:stroke .2s;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8}
+.acc.open .acc-ico svg{stroke:var(--or)}
+.acc-lbl{flex:1;font-size:13px;font-weight:500;color:var(--w50);transition:color .2s}
+.acc.open .acc-lbl{color:var(--w)}
+.acc-chev{transition:transform .25s var(--ease)}
+.acc-chev svg{width:12px;height:12px;stroke:var(--w20);fill:none;stroke-width:2;stroke-linecap:round}
+.acc.open .acc-chev{transform:rotate(90deg)}
+.acc-body{height:0;overflow:hidden;transition:height .3s var(--ease)}
+.acc-content{padding:4px 14px 13px}
+/* sub rows */
+.sub-r{display:flex;align-items:center;justify-content:space-between;padding:8px 0;border-bottom:1px solid var(--ln)}
+.sub-r:last-child{border-bottom:none}
+.sub-lbl{font-size:12px;color:var(--w50);font-weight:400}
+.sub-sub{font-size:11px;color:var(--w20);margin-top:2px}
+.tog{width:36px;height:19px;background:var(--s4);border-radius:10px;position:relative;cursor:pointer;transition:all .2s;flex-shrink:0}
+.tog.on{background:var(--or)}
+.tog::after{content:'';position:absolute;top:2.5px;left:2.5px;width:14px;height:14px;border-radius:50%;background:#fff;transition:left .2s;box-shadow:0 1px 4px rgba(0,0,0,.3)}
+.tog.on::after{left:19.5px}
+.sp-btn{display:flex;align-items:center;gap:9px;padding:8px 0;font-size:12px;color:var(--w50);cursor:pointer;border-bottom:1px solid var(--ln);transition:color .15s;width:100%;text-align:left}
+.sp-btn:last-child{border-bottom:none}
+.sp-btn:hover{color:var(--w)}
+.sp-btn svg{width:13px;height:13px;stroke:currentColor;fill:none;stroke-linecap:round;stroke-linejoin:round;stroke-width:1.8;flex-shrink:0;opacity:.7}
+.sp-btn:hover svg{opacity:1}
+
+.dev-hist-row{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--ln)}
+.dev-hist-row:last-child{border-bottom:none;padding-bottom:2px}
+.dev-hist-icon{width:32px;height:32px;border-radius:9px;display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dev-hist-icon svg{width:14px;height:14px}
+.dev-hist-info{flex:1;min-width:0}
+.dev-hist-nm{font-size:12px;font-weight:500;color:var(--w80);white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dev-hist-sub{font-size:10px;color:var(--w30);margin-top:2px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.dev-hist-badge{font-size:9px;font-weight:600;letter-spacing:.05em;padding:2px 7px;border-radius:5px;white-space:nowrap}
+.dev-hist-ts{font-size:10px;color:var(--w20);letter-spacing:.03em}
+
+.sp-btn.danger{color:rgba(239,68,68,.8)}
+.sp-btn.danger:hover{color:var(--re)}
+/* device rows */
+.dev-r{display:flex;align-items:center;gap:10px;padding:8px 0;border-bottom:1px solid var(--ln)}
+.dev-r:last-child{border-bottom:none}
+.dev-ico-w{width:30px;height:30px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.dev-ico-w svg{width:14px;height:14px;stroke:var(--w50);fill:none;stroke-width:1.8;stroke-linecap:round}
+.dev-i{flex:1}
+.dev-nm{font-size:12px;font-weight:500;color:var(--w50)}
+.dev-mt{font-size:11px;color:var(--w20);margin-top:1px}
+.badge-on{font-size:9px;font-weight:600;letter-spacing:.05em;padding:2px 7px;border-radius:4px;background:rgba(240,90,0,.12);border:1px solid rgba(240,90,0,.3);color:var(--or)}
+/* act rows */
+.act-r{display:flex;align-items:flex-start;gap:9px;padding:8px 0;border-bottom:1px solid var(--ln)}
+.act-r:last-child{border-bottom:none}
+.act-pip{width:6px;height:6px;border-radius:50%;margin-top:5px;flex-shrink:0}
+.act-c{flex:1}
+.act-m{font-size:12px;color:var(--w50);line-height:1.45}
+.act-m strong{color:var(--w);font-weight:500}
+.act-t{font-size:10px;color:var(--w20);margin-top:2px}
+/* score */
+.score-c{background:var(--s2);border-radius:10px;padding:14px;text-align:center;margin-bottom:10px;border:1px solid var(--ln)}
+.score-v{font-family:var(--fm);font-size:30px;font-weight:600;color:var(--or);letter-spacing:-.04em}
+.score-l{font-size:10px;color:var(--w20);letter-spacing:.1em;text-transform:uppercase;margin-top:3px}
+
+/* ══ APP TIMINGS MODAL ═══════════════════════════════════════════════════════ */
+#timings-modal{position:fixed;inset:0;z-index:8000;background:rgba(0,0,0,.88);backdrop-filter:blur(14px);display:flex;align-items:center;justify-content:center;transition:opacity .2s,visibility .2s}
+#timings-modal.gone{opacity:0;visibility:hidden;pointer-events:none}
+.tm-card{width:740px;max-width:96vw;max-height:90vh;background:var(--s1);border:1px solid var(--ln);border-radius:20px;display:flex;flex-direction:column;overflow:hidden;box-shadow:0 40px 100px rgba(0,0,0,.8);animation:mIn .25s var(--ease)}
+.tm-head{padding:18px 22px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:12px;flex-shrink:0;background:var(--bg)}
+.tm-head h3{font-family:var(--fd);font-size:16px;font-weight:700;flex:1;letter-spacing:-.01em}
+.tm-x{width:28px;height:28px;border-radius:8px;background:var(--s2);border:1px solid var(--ln);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--w20);cursor:pointer;transition:all .15s}
+.tm-x:hover{background:var(--re);border-color:var(--re);color:#fff}
+.tm-body{flex:1;overflow-y:auto;padding:20px 22px}
+/* Period tabs */
+.period-tabs{display:flex;gap:6px;margin-bottom:20px}
+.pt{padding:6px 16px;border-radius:8px;font-size:12px;font-weight:500;color:var(--w20);border:1px solid var(--ln);cursor:pointer;transition:all .18s}
+.pt.on{background:var(--or);border-color:var(--or);color:#fff}
+/* Big clock hero */
+.tm-hero{text-align:center;margin-bottom:16px;padding:10px 0}
+.tm-clock{font-family:var(--fm);font-size:52px;font-weight:600;color:rgba(150,120,255,.9);letter-spacing:-.02em;line-height:1}
+.tm-clock-sub{font-size:13px;color:var(--w20);margin-top:6px;cursor:pointer;display:inline-flex;align-items:center;gap:4px}
+.tm-clock-sub svg{width:12px;height:12px;stroke:var(--w20)}
+/* Limit pill */
+.tm-limit-pill{display:inline-flex;align-items:center;gap:6px;padding:5px 14px;background:var(--s2);border:1px solid var(--ln);border-radius:20px;font-size:12px;color:var(--w50);margin-bottom:16px;cursor:pointer}
+.tm-limit-pill svg{width:12px;height:12px;stroke:var(--w50)}
+/* Progress */
+.tm-progress-wrap{margin-bottom:20px}
+.tm-progress-label{display:flex;align-items:center;justify-content:space-between;margin-bottom:6px;font-size:12px;color:var(--w50)}
+.tm-progress-label span{color:var(--w);font-weight:500}
+.tm-prog-track{height:7px;background:var(--s3);border-radius:4px;overflow:hidden}
+.tm-prog-fill{height:100%;border-radius:4px;background:linear-gradient(90deg,rgba(130,100,240,.6),rgba(150,120,255,.9));transition:width .8s var(--ease)}
+/* 2-col stat grid */
+.tm-grid{display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:16px}
+.tm-stat{background:var(--s2);border:1px solid var(--ln);border-radius:13px;padding:16px 16px 14px;position:relative;overflow:hidden;transition:border-color .2s}
+.tm-stat:hover{border-color:var(--w10)}
+.tm-stat-title{font-size:11px;color:var(--w50);font-weight:400;margin-bottom:10px;letter-spacing:.02em}
+.tm-stat-val{display:flex;align-items:baseline;gap:4px;flex-wrap:wrap}
+.tm-stat-num{font-family:var(--fd);font-size:26px;font-weight:700;color:var(--w);line-height:1}
+.tm-stat-unit{font-size:13px;color:var(--w50);font-weight:400}
+.tm-stat-num2{font-family:var(--fd);font-size:20px;font-weight:700;color:var(--w);line-height:1}
+.tm-stat-unit2{font-size:12px;color:var(--w50)}
+.tm-stat-range{font-size:10px;color:var(--w30);margin-top:5px;font-family:var(--fm);letter-spacing:.04em}
+.tm-stat-icon{position:absolute;bottom:12px;right:12px;width:36px;height:36px;display:flex;align-items:center;justify-content:center;border-radius:10px;opacity:.8}
+.tm-stat-icon svg{width:22px;height:22px}
+/* App list cards */
+.tm-app-card{background:var(--s2);border:1px solid var(--ln);border-radius:13px;padding:16px}
+.tm-app-card-title{font-size:11px;color:var(--w50);font-weight:400;margin-bottom:12px;letter-spacing:.02em}
+.tm-app-row{display:flex;align-items:center;gap:10px;padding:5px 0;border-bottom:1px solid var(--ln)}
+.tm-app-row:last-child{border-bottom:none;padding-bottom:0}
+.tm-app-ico{width:24px;height:24px;object-fit:contain;flex-shrink:0}
+.tm-app-name{flex:1;font-size:12px;color:var(--w80);font-weight:400}
+.tm-app-time{font-size:12px;color:var(--w50);font-family:var(--fm);flex-shrink:0}
+
+/* ══ THEME MODAL ════════════════════════════════════════════════════════════ */
+#theme-modal{position:fixed;inset:0;z-index:8500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.75);backdrop-filter:blur(10px);transition:opacity .2s,visibility .2s}
+#theme-modal.gone{opacity:0;visibility:hidden;pointer-events:none}
+.th-card{width:360px;max-width:94vw;background:var(--s1);border:1px solid var(--ln);border-radius:18px;overflow:hidden;box-shadow:0 32px 80px rgba(0,0,0,.7);animation:mIn .25s var(--ease)}
+.th-head{padding:18px 20px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:10px}
+.th-head h3{font-family:var(--fd);font-size:15px;font-weight:700;flex:1}
+.th-x{width:28px;height:28px;border-radius:7px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--w20);cursor:pointer;transition:all .15s}
+.th-x:hover{background:var(--re);color:#fff}
+.th-body{padding:16px 20px 20px;display:flex;flex-direction:column;gap:10px}
+.th-opt{display:flex;align-items:center;gap:14px;padding:14px 16px;border:1.5px solid var(--ln);border-radius:12px;cursor:pointer;transition:all .2s}
+.th-opt:hover{border-color:var(--w10);background:var(--w03)}
+.th-opt.active{border-color:var(--or);background:var(--o08)}
+.th-opt-icon{width:38px;height:38px;border-radius:10px;background:var(--s2);display:flex;align-items:center;justify-content:center;flex-shrink:0;transition:background .2s}
+.th-opt.active .th-opt-icon{background:var(--o15)}
+.th-opt-icon svg{width:18px;height:18px;stroke:var(--w50);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.th-opt.active .th-opt-icon svg{stroke:var(--or)}
+.th-opt-text{flex:1}
+.th-opt-name{font-size:13px;font-weight:500;color:var(--w80)}
+.th-opt.active .th-opt-name{color:var(--w)}
+.th-opt-sub{font-size:11px;color:var(--w20);margin-top:2px}
+.th-check{width:18px;height:18px;border-radius:50%;border:2px solid var(--s5);flex-shrink:0;display:flex;align-items:center;justify-content:center;transition:all .2s}
+.th-opt.active .th-check{background:var(--or);border-color:var(--or)}
+.th-check-dot{width:7px;height:7px;border-radius:50%;background:#fff;opacity:0;transition:opacity .15s}
+.th-opt.active .th-check-dot{opacity:1}
+
+/* ══ TOASTS ══════════════════════════════════════════════════════════════════ */
+#toasts{position:fixed;bottom:22px;right:22px;z-index:9999;display:flex;flex-direction:column;gap:6px;pointer-events:none}
+.toast{display:flex;align-items:center;gap:8px;padding:11px 15px;background:var(--s2);border:1px solid var(--ln);border-radius:10px;font-size:12px;color:var(--w50);box-shadow:0 10px 28px rgba(0,0,0,.6);animation:tIn .25s var(--ease);max-width:270px}
+.toast.out{animation:tOut .2s ease forwards}
+@keyframes tIn{from{opacity:0;transform:translateX(20px)}to{opacity:1;transform:none}}
+@keyframes tOut{to{opacity:0;transform:translateX(20px)}}
+.tpip{width:6px;height:6px;border-radius:50%;flex-shrink:0}
+.toast.s .tpip{background:var(--gr)}
+.toast.e .tpip{background:var(--re)}
+.toast.i .tpip{background:var(--or)}
+
+.app-load-wrap{position:absolute;inset:0;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:14px;pointer-events:none;z-index:2}
+.app-load-spinner{width:36px;height:36px;border-radius:50%;border:2.5px solid var(--s4);border-top-color:var(--or);animation:spinR 1s linear infinite}
+.app-load-name{font-family:var(--fd);font-size:16px;font-weight:700;color:var(--w)}
+.app-load-url{font-size:11px;color:var(--w20);font-family:var(--fm)}
+
+/* Ripple */
+
+/* ══ LIGHT THEME OVERRIDE ═══════════════════════════════════════════════════ */
+body.theme-light{
+  --bg:#f0f0f0;--s1:#ffffff;--s2:#f5f5f5;--s3:#ebebeb;--s4:#e0e0e0;--s5:#cccccc;
+  --w:#111111;--w80:rgba(0,0,0,.80);--w50:rgba(0,0,0,.50);
+  --w20:rgba(0,0,0,.22);--w10:rgba(0,0,0,.10);--w06:rgba(0,0,0,.06);--w03:rgba(0,0,0,.03);
+  --ln:rgba(0,0,0,.08);
+}
+
+
+.app-embed-wrap{width:100%;height:100%;display:flex;flex-direction:column}
+.app-embed-topstrip{height:36px;background:var(--s1);border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:8px;padding:0 14px;font-size:12px;color:var(--w50);flex-shrink:0}
+.app-embed-pill{margin-left:auto;font-size:10px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:10px;background:rgba(240,90,0,.1);border:1px solid rgba(240,90,0,.25);color:var(--orl)}
+.am-spinner{width:32px;height:32px;border-radius:50%;border:2.5px solid var(--s4);border-top-color:var(--or);animation:spinR 1s linear infinite}
+.sync-pulse{width:8px;height:8px;border-radius:50%;background:var(--or);animation:syncP 1.5s ease-in-out infinite;flex-shrink:0}
+@keyframes syncP{0%,100%{opacity:1;transform:scale(1)}50%{opacity:.4;transform:scale(.7)}}
+.rh{position:relative;overflow:hidden}
+.rp{position:absolute;border-radius:50%;background:rgba(255,255,255,.05);transform:scale(0);animation:rpA .5s linear;pointer-events:none}
+@keyframes rpA{to{transform:scale(4);opacity:0}}
+
+
+
+/* ══ PROFILE MODAL ═══════════════════════════════════════════════════════════ */
+#profile-modal{position:fixed;inset:0;z-index:9000;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.8);backdrop-filter:blur(14px);transition:opacity .2s,visibility .2s}
+#profile-modal.gone{opacity:0;visibility:hidden;pointer-events:none}
+.pm-card{width:480px;max-width:95vw;background:var(--s1);border:1px solid var(--ln);border-radius:20px;overflow:hidden;box-shadow:0 40px 80px rgba(0,0,0,.7);animation:mIn .25s var(--ease)}
+.pm-head{padding:18px 22px;border-bottom:1px solid var(--ln);display:flex;align-items:center;gap:10px}
+.pm-head h3{font-family:var(--fd);font-size:16px;font-weight:700;flex:1}
+.pm-x{width:28px;height:28px;border-radius:8px;background:var(--s2);display:flex;align-items:center;justify-content:center;font-size:13px;color:var(--w20);cursor:pointer;transition:all .15s}
+.pm-x:hover{background:var(--re);color:#fff}
+.pm-body{padding:24px 22px;display:flex;flex-direction:column;gap:20px}
+/* Avatar upload */
+.pm-avatar-row{display:flex;align-items:center;gap:18px}
+.pm-avatar-wrap{position:relative;cursor:pointer}
+.pm-avatar{width:72px;height:72px;border-radius:50%;display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:28px;font-weight:700;color:#fff;background:var(--or);border:3px solid rgba(240,90,0,.3);overflow:hidden;transition:all .2s;flex-shrink:0}
+.pm-avatar img{width:100%;height:100%;object-fit:cover}
+.pm-avatar-overlay{position:absolute;inset:0;border-radius:50%;background:rgba(0,0,0,.5);display:flex;align-items:center;justify-content:center;opacity:0;transition:opacity .2s}
+.pm-avatar-wrap:hover .pm-avatar-overlay{opacity:1}
+.pm-avatar-overlay svg{width:20px;height:20px;stroke:#fff;stroke-width:1.8;fill:none}
+.pm-avatar-info{flex:1}
+.pm-avatar-name{font-size:16px;font-weight:600;color:var(--w);margin-bottom:3px}
+.pm-avatar-email{font-size:12px;color:var(--w30)}
+.pm-avatar-btns{display:flex;gap:8px;margin-top:8px}
+.pm-avatar-btn{font-size:11px;padding:5px 12px;border-radius:7px;cursor:pointer;transition:all .18s;font-weight:500}
+.pm-avatar-btn.primary{background:rgba(240,90,0,.15);border:1px solid rgba(240,90,0,.3);color:var(--orl)}
+.pm-avatar-btn.primary:hover{background:rgba(240,90,0,.25)}
+.pm-avatar-btn.danger{background:var(--s2);border:1px solid var(--ln);color:var(--w30)}
+.pm-avatar-btn.danger:hover{background:rgba(239,68,68,.12);border-color:rgba(239,68,68,.3);color:var(--re)}
+/* Form fields */
+.pm-field{display:flex;flex-direction:column;gap:6px}
+.pm-label{font-size:11px;font-weight:600;letter-spacing:.08em;text-transform:uppercase;color:var(--w30)}
+.pm-input{padding:10px 14px;background:var(--s2);border:1px solid var(--ln);border-radius:10px;font-size:13px;color:var(--w);font-family:var(--f);transition:border-color .18s;outline:none}
+.pm-input:focus{border-color:rgba(240,90,0,.4)}
+.pm-input:disabled{opacity:.4;cursor:not-allowed}
+.pm-divider{height:1px;background:var(--ln)}
+.pm-section-title{font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--w20);margin-bottom:-8px}
+.pm-stat-grid{display:grid;grid-template-columns:1fr 1fr 1fr;gap:10px}
+.pm-stat{background:var(--s2);border:1px solid var(--ln);border-radius:12px;padding:14px 16px;text-align:center}
+.pm-stat-val{font-family:var(--fm);font-size:22px;font-weight:600;color:var(--or)}
+.pm-stat-lbl{font-size:10px;color:var(--w30);margin-top:4px;letter-spacing:.05em;text-transform:uppercase}
+.pm-save-btn{padding:12px;background:var(--or);border-radius:10px;font-family:var(--fd);font-size:14px;font-weight:700;color:#fff;cursor:pointer;border:none;width:100%;transition:all .2s;letter-spacing:.04em}
+.pm-save-btn:hover{background:var(--orl);transform:translateY(-1px)}
+/* ══ SECRET VAULT ════════════════════════════════════════════════════════════ */
+#vault-modal{position:fixed;inset:0;z-index:9500;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,.9);backdrop-filter:blur(20px);transition:opacity .2s,visibility .2s}
+#vault-modal.gone{opacity:0;visibility:hidden;pointer-events:none}
+.vault-card{width:380px;max-width:94vw;background:var(--s1);border:1px solid rgba(240,90,0,.2);border-radius:20px;padding:32px 28px;display:flex;flex-direction:column;align-items:center;gap:16px;box-shadow:0 0 60px rgba(240,90,0,.08);animation:mIn .25s var(--ease)}
+.vault-icon{width:56px;height:56px;border-radius:16px;background:rgba(240,90,0,.1);border:1px solid rgba(240,90,0,.2);display:flex;align-items:center;justify-content:center}
+.vault-icon svg{width:26px;height:26px;stroke:var(--or);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.vault-title{font-family:var(--fd);font-size:20px;font-weight:800;color:var(--w);letter-spacing:-.01em}
+.vault-sub{font-size:12px;color:var(--w30);text-align:center;line-height:1.6}
+.vault-dots{display:flex;gap:12px;margin:4px 0}
+.vault-dot{width:14px;height:14px;border-radius:50%;border:2px solid var(--s5);transition:all .2s}
+.vault-dot.filled{background:var(--or);border-color:var(--or)}
+.vault-pad{display:grid;grid-template-columns:repeat(3,1fr);gap:8px;width:100%}
+.vault-key{height:48px;border-radius:10px;background:var(--s2);border:1px solid var(--ln);font-family:var(--fd);font-size:18px;font-weight:600;color:var(--w);cursor:pointer;transition:all .15s;display:flex;align-items:center;justify-content:center}
+.vault-key:hover{background:var(--s3);border-color:var(--or);color:var(--or)}
+.vault-key.del{font-size:13px;color:var(--w30)}
+.vault-key.del:hover{color:var(--re);border-color:rgba(239,68,68,.3)}
+.vault-error{font-size:12px;color:var(--re);height:16px;text-align:center}
+.vault-change{font-size:11px;color:var(--w20);cursor:pointer;text-decoration:underline;margin-top:-4px}
+.vault-change:hover{color:var(--or)}
+/* Secret apps grid inside main catalog */
+.secret-section{margin-top:8px;border-top:1px solid var(--ln);padding-top:14px}
+.secret-section-header{display:flex;align-items:center;gap:8px;font-size:11px;font-weight:600;letter-spacing:.1em;text-transform:uppercase;color:var(--or);margin-bottom:10px;cursor:pointer}
+.secret-section-header svg{width:13px;height:13px;stroke:var(--or);fill:none;stroke-width:1.8;stroke-linecap:round}
+
+/* ══ VAULT DASHBOARD ═════════════════════════════════════════════════════════ */
+#vault-dash{position:fixed;inset:0;z-index:9400;display:flex;flex-direction:column;background:var(--bg);transition:opacity .3s,visibility .3s}
+#vault-dash.gone{opacity:0;visibility:hidden;pointer-events:none}
+.vd-topbar{height:52px;background:var(--s1);border-bottom:1px solid rgba(240,90,0,.15);display:flex;align-items:center;padding:0 20px;gap:12px;flex-shrink:0}
+.vd-topbar-icon{width:28px;height:28px;border-radius:8px;background:rgba(240,90,0,.12);display:flex;align-items:center;justify-content:center;flex-shrink:0}
+.vd-topbar-icon svg{width:15px;height:15px;stroke:var(--or);fill:none;stroke-width:1.8;stroke-linecap:round;stroke-linejoin:round}
+.vd-topbar-title{font-family:var(--fd);font-size:15px;font-weight:700;color:var(--or);letter-spacing:.04em}
+.vd-topbar-badge{font-size:10px;font-weight:600;letter-spacing:.08em;padding:3px 10px;border-radius:20px;background:rgba(240,90,0,.1);border:1px solid rgba(240,90,0,.2);color:var(--orl);text-transform:uppercase;margin-left:4px}
+.vd-topbar-right{margin-left:auto;display:flex;align-items:center;gap:8px}
+.vd-lock-btn{padding:7px 16px;border-radius:8px;background:rgba(239,68,68,.12);border:1px solid rgba(239,68,68,.25);color:#ef4444;font-size:11px;font-weight:700;cursor:pointer;display:flex;align-items:center;gap:6px;transition:all .18s;letter-spacing:.04em}
+.vd-lock-btn:hover{background:rgba(239,68,68,.2);border-color:rgba(239,68,68,.4)}
+.vd-lock-btn svg{width:12px;height:12px;stroke:currentColor;fill:none;stroke-width:2;stroke-linecap:round}
+.vd-body{flex:1;overflow-y:auto;padding:32px 36px}
+.vd-hint{display:flex;align-items:center;gap:10px;padding:12px 16px;background:rgba(240,90,0,.06);border:1px solid rgba(240,90,0,.12);border-radius:12px;font-size:12px;color:var(--w50);margin-bottom:24px}
+.vd-hint svg{width:16px;height:16px;stroke:var(--or);fill:none;stroke-width:1.8;flex-shrink:0}
+.vd-section-title{font-size:11px;font-weight:600;letter-spacing:.12em;text-transform:uppercase;color:var(--w50);margin-bottom:14px}
+.vd-apps-grid{display:grid;grid-template-columns:repeat(auto-fill,minmax(116px,1fr));gap:10px;margin-bottom:28px}
+.vd-add-section{margin-top:4px}
+.vd-add-row{display:flex;gap:8px;align-items:center}
+.vd-add-select{flex:1;padding:10px 14px;background:var(--s2);border:1px solid var(--ln);border-radius:10px;color:var(--w);font-family:var(--f);font-size:12px;outline:none}
+.vd-add-select:focus{border-color:rgba(240,90,0,.4)}
+.vd-add-btn{padding:10px 18px;border-radius:10px;background:rgba(240,90,0,.15);border:1px solid rgba(240,90,0,.25);color:var(--orl);font-size:12px;font-weight:600;cursor:pointer;transition:all .18s;white-space:nowrap}
+.vd-add-btn:hover{background:rgba(240,90,0,.25);border-color:rgba(240,90,0,.4)}
+.vd-empty{grid-column:1/-1;text-align:center;padding:40px 20px;color:var(--w20);font-size:13px;line-height:1.7}
+/* Vault app view nav strip */
+.vd-nav{height:40px;background:var(--s1);border-bottom:1px solid rgba(240,90,0,.12);display:flex;align-items:center;padding:0 14px;gap:8px;flex-shrink:0}
+.vd-nav-badge{margin-left:auto;font-size:9px;font-weight:700;letter-spacing:.08em;text-transform:uppercase;padding:3px 10px;border-radius:10px;background:rgba(240,90,0,.1);border:1px solid rgba(240,90,0,.2);color:var(--orl)}
+.vd-app-body{flex:1;overflow:hidden;position:relative}
+
+/* ── Cookie Import Signin ───────────── */
+.signin-hint-bar{
+  position:absolute;bottom:16px;left:50%;transform:translateX(-50%);
+  background:var(--s1);border:1px solid var(--ln);border-radius:12px;
+  padding:12px 20px;display:flex;align-items:center;gap:12px;
+  font-size:12px;color:var(--w50);z-index:500;box-shadow:0 8px 32px rgba(0,0,0,.4);
+  white-space:nowrap;animation:slideUp .3s var(--ease);
+}
+.signin-hint-bar.gone{display:none}
+.shb-btn{padding:7px 16px;border-radius:8px;background:var(--or);color:#fff;
+  font-size:11px;font-weight:700;cursor:pointer;border:none;transition:all .18s;white-space:nowrap}
+.shb-btn:hover{background:var(--orl)}
+.shb-btn.ghost{background:var(--s3);color:var(--w30)}
+@keyframes slideUp{from{opacity:0;transform:translateX(-50%) translateY(12px)}to{opacity:1;transform:translateX(-50%) translateY(0)}}
+</style>
+</head>
+<body>
+
+<!-- ══ LOADING ══ -->
+<div id="ld">
+  <div class="ld-logo-mark">
+          <svg width="100" height="100" viewBox="0 0 100 100" fill="none">
+                <defs>
+                  <clipPath id="ac-ld-clip">
+                    <circle cx="50" cy="50" r="44"/>
+                  </clipPath>
+                </defs>
+                <g clip-path="url(#ac-ld-clip)">
+                  <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="1.6" fill="none" opacity=".4"/>
+                  <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="1.6" fill="none" opacity=".4" transform="rotate(60 50 50)"/>
+                  <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="1.6" fill="none" opacity=".4" transform="rotate(120 50 50)"/>
+                  <circle id="ac-ld-p0" cx="88" cy="50" r="4.5" fill="#ff7530"/>
+                  <circle id="ac-ld-p1" cx="69" cy="82.91" r="3.8" fill="#ff7530"/>
+                  <circle id="ac-ld-p2" cx="31" cy="82.91" r="3.2" fill="#ff7530"/>
+                  <circle cx="50" cy="50" r="8.5" fill="#f05a00" opacity=".1"/>
+                  <circle cx="50" cy="50" r="5.5" fill="#ff7530"/>
+                  <circle cx="50" cy="50" r="2.2" fill="#fff" opacity=".4"/>
+                </g>
+              </svg>
+  </div>
+  <div class="ld-word">
+    <div class="ld-l">C</div><div class="ld-l">L</div><div class="ld-l">Y</div><div class="ld-l">X</div>
+  </div>
+  <div class="ld-bar-wrap"><div class="ld-bar-fill"></div></div>
+  <div class="ld-tagline">Your Digital Universe, Unified</div>
+</div>
+
+<!-- ══ AUTH ══ -->
+<div id="auth" class="gone">
+  <div class="a-left">
+    <div class="a-left-content">
+      <div class="a-left-logo">
+                <svg width="88" height="88" viewBox="0 0 100 100" fill="none">
+                  <defs>
+                    <clipPath id="ac-au-clip">
+                      <circle cx="50" cy="50" r="44"/>
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#ac-au-clip)">
+                    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="1.5" fill="none" opacity=".4"/>
+                    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="1.5" fill="none" opacity=".4" transform="rotate(60 50 50)"/>
+                    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="1.5" fill="none" opacity=".4" transform="rotate(120 50 50)"/>
+                    <circle id="ac-au-p0" cx="88" cy="50" r="4.5" fill="#ff7530"/>
+                    <circle id="ac-au-p1" cx="69" cy="82.91" r="3.8" fill="#ff7530"/>
+                    <circle id="ac-au-p2" cx="31" cy="82.91" r="3.2" fill="#ff7530"/>
+                    <circle cx="50" cy="50" r="8.5" fill="#f05a00" opacity=".1"/>
+                    <circle cx="50" cy="50" r="5.5" fill="#ff7530"/>
+                    <circle cx="50" cy="50" r="2.2" fill="#fff" opacity=".4"/>
+                  </g>
+                </svg>
+      </div>
+      <h1>CL<span class="y-plain">Y</span><span class="x-glow">X</span></h1>
+      <p>One login unlocks all your apps across every device you own.</p>
+    </div>
+  </div>
+  <div class="a-right">
+    <h2>Welcome back</h2>
+    <div class="a-sub">Sign in to your CLYX universe</div>
+    <div class="seg">
+      <button class="seg-b on" onclick="setAuthTab('in',this)">Sign In</button>
+      <button class="seg-b" onclick="setAuthTab('up',this)">Sign Up</button>
+    </div>
+    <div id="f-in" style="width:100%">
+      <div class="fld"><label>Email</label><input id="li-e" type="email" placeholder="you@example.com" value="demo@clyx.app"/></div>
+      <div class="fld"><label>Password</label><input id="li-p" type="password" placeholder="••••••••" value="demo1234"/></div>
+      <button class="btn-main rh" onclick="doLogin(event)">Enter Universe</button>
+    </div>
+    <div id="f-up" style="display:none;width:100%">
+      <div class="fld"><label>Name</label><input id="su-n" type="text" placeholder="Alex Johnson"/></div>
+      <div class="fld"><label>Email</label><input id="su-e" type="email" placeholder="you@example.com"/></div>
+      <div class="fld"><label>Master Password</label><input id="su-p" type="password" placeholder="min 8 characters"/></div>
+      <button class="btn-main rh" onclick="doSignup(event)">Create Universe</button>
+    </div>
+    <!-- Google sign-in waiting panel (shown while browser auth is in progress) -->
+    <div id="f-google" style="display:none;width:100%">
+      <div style="text-align:center;padding:16px 0 8px">
+        <div style="margin-bottom:20px">
+          <div class="am-spinner" style="margin:0 auto;width:40px;height:40px;border-width:3px"></div>
+        </div>
+        <div style="display:inline-flex;align-items:center;gap:8px;padding:10px 20px;background:rgba(240,90,0,.08);border:1px solid rgba(240,90,0,.2);border-radius:22px;font-size:13px;color:var(--or);font-weight:500;margin-bottom:14px">
+          <div class="sync-pulse"></div>
+          Waiting for Google sign-in…
+        </div>
+        <p style="font-size:12px;color:var(--w50);text-align:center;margin-bottom:6px;line-height:1.65">
+          Complete sign-in in your browser.<br>CLYX will log you in automatically.
+        </p>
+        <p style="font-size:11px;color:var(--w20);text-align:center;line-height:1.5">
+          A Google account picker should have opened<br>in your default browser.
+        </p>
+      </div>
+      <div class="dvd" style="margin:16px 0">or</div>
+      <button class="btn-g rh" onclick="cancelGoogleAuth()">
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><polyline points="15 18 9 12 15 6"/></svg>
+        Back to Login
+      </button>
+    </div>
+    <div id="f-google-divider" class="dvd">or</div>
+    <button class="btn-g rh" id="btn-google-main" onclick="doGoogle(event)">
+      <svg width="16" height="16" viewBox="0 0 24 24"><path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z"/><path fill="#34A853" d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z"/><path fill="#FBBC05" d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z"/><path fill="#EA4335" d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z"/></svg>
+      Continue with Google
+    </button>
+    <p class="a-note">Sessions AES-256 encrypted · Synced across all devices</p>
+  </div>
+</div>
+
+<!-- ══ APP ══ -->
+<div id="app" class="gone">
+  <div class="tb">
+    <div class="tb-brand" onclick="goHome()">
+      <div class="tb-lm">
+                <svg width="28" height="28" viewBox="0 0 100 100" fill="none">
+                  <defs>
+                    <clipPath id="ac-tb-clip">
+                      <circle cx="50" cy="50" r="44"/>
+                    </clipPath>
+                  </defs>
+                  <g clip-path="url(#ac-tb-clip)">
+                    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="2.5" fill="none" opacity=".45"/>
+                    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="2.5" fill="none" opacity=".45" transform="rotate(60 50 50)"/>
+                    <ellipse cx="50" cy="50" rx="38" ry="14" stroke="#f05a00" stroke-width="2.5" fill="none" opacity=".45" transform="rotate(120 50 50)"/>
+                    <circle id="ac-tb-p0" cx="88" cy="50" r="4.2" fill="#ff7530"/>
+                    <circle id="ac-tb-p1" cx="69" cy="82.91" r="3.5" fill="#ff7530"/>
+                    <circle id="ac-tb-p2" cx="31" cy="82.91" r="2.9" fill="#ff7530"/>
+                    <circle cx="50" cy="50" r="7.8" fill="#f05a00" opacity=".1"/>
+                    <circle cx="50" cy="50" r="4.8" fill="#ff7530"/>
+                    <circle cx="50" cy="50" r="1.8" fill="#fff" opacity=".4"/>
+                  </g>
+                </svg>
+      </div>
+      <span class="tb-name">CLYX</span>
+    </div>
+    <div class="tb-sep"></div>
+    <div class="tab-scroll" id="tab-scroll"></div>
+    <button class="tab-add" onclick="openModal()" title="Add app">+</button>
+    <div class="tb-right">
+      <button class="ib" onclick="openSettings()">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 00.33 1.82l.06.06a2 2 0 010 2.83 2 2 0 01-2.83 0l-.06-.06a1.65 1.65 0 00-1.82-.33 1.65 1.65 0 00-1 1.51V21a2 2 0 01-4 0v-.09A1.65 1.65 0 009 19.4a1.65 1.65 0 00-1.82.33l-.06.06a2 2 0 01-2.83-2.83l.06-.06A1.65 1.65 0 004.68 15a1.65 1.65 0 00-1.51-1H3a2 2 0 010-4h.09A1.65 1.65 0 004.6 9a1.65 1.65 0 00-.33-1.82l-.06-.06a2 2 0 012.83-2.83l.06.06A1.65 1.65 0 009 4.68a1.65 1.65 0 001-1.51V3a2 2 0 014 0v.09a1.65 1.65 0 001 1.51 1.65 1.65 0 001.82-.33l.06-.06a2 2 0 012.83 2.83l-.06.06A1.65 1.65 0 0019.4 9a1.65 1.65 0 001.51 1H21a2 2 0 010 4h-.09a1.65 1.65 0 00-1.51 1z"/></svg>
+      </button>
+      <div class="av-wrap">
+        <div class="av" id="av-btn" onclick="toggleAvMenu()">A</div>
+        <div class="av-menu" id="av-menu">
+          <div class="av-mhead">
+            <div style="display:flex;align-items:center;gap:10px;margin-bottom:8px">
+              <div id="av-pic" onclick="cycleAvColor()" style="width:40px;height:40px;border-radius:50%;background:var(--or);display:flex;align-items:center;justify-content:center;font-family:var(--fd);font-size:16px;font-weight:700;cursor:pointer;transition:background .25s;flex-shrink:0;border:2px solid rgba(240,90,0,.35)" title="Tap to change color">A</div>
+              <div style="flex:1;min-width:0">
+                <div class="av-mname" id="av-name">Alex</div>
+                <div class="av-memail" id="av-email" style="overflow:hidden;text-overflow:ellipsis;white-space:nowrap"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="7c181911133c1f100504521d0c0c">[email&#160;protected]</a></div>
+              </div>
+            </div>
+            <div style="font-size:11px;color:var(--or);font-weight:500;letter-spacing:.04em;padding:4px 0 2px">Your space, your rules</div>
+          </div>
+          <div class="av-item" onclick="closeAvMenu();openProfile()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>
+            My Profile
+          </div>
+          <div class="av-item" onclick="closeAvMenu();openTimings()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="3" width="18" height="18" rx="2"/><path d="M8 17V13M12 17V8M16 17v-5"/></svg>
+            App Timings
+          </div>
+          <div class="av-item" onclick="closeAvMenu();openVault()" style="color:var(--or)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round" stroke="var(--or)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+            Secret Vault
+          </div>
+          <div class="av-item" onclick="closeAvMenu();openSettings();setTimeout(()=>openAccordion('activity'),200)">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg>
+            History
+          </div>
+          <div class="av-item" onclick="closeAvMenu();openTheme()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="4"/><path d="M12 2v2M12 20v2M4.93 4.93l1.41 1.41M17.66 17.66l1.41 1.41M2 12h2M20 12h2M4.93 19.07l1.41-1.41M17.66 6.34l1.41-1.41"/></svg>
+            Theme
+          </div>
+          <div class="av-div"></div>
+          <div class="av-item danger" onclick="doLogout()">
+            <svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>
+            Logout
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="content">
+    <!-- DASHBOARD -->
+    <div class="view" id="dash">
+      <div class="dash-greet">
+        <div class="dash-greet-top">
+          <div class="dash-greet-text">
+            <h2>Back to your space, <em id="uname">Alex</em></h2>
+            <p>All sessions active · encrypted · synced across every device</p>
+          </div>
+          <button class="sync-pill" onclick="realSync()" id="sync-pill-btn">
+            <div class="sync-pulse"></div>
+            <span id="sync-pill-text">Cloud Synced</span>
+          </button>
+        </div>
+        <div class="metrics">
+          <!-- Apps Installed -->
+          <div class="metric">
+            <div class="metric-top">
+              <div class="metric-icon-pill" style="background:rgba(240,90,0,.15);border:1px solid rgba(240,90,0,.25)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#f05a00">
+                  <rect x="3" y="3" width="7.5" height="7.5" rx="1.5" fill="rgba(240,90,0,.2)" stroke="#f05a00" stroke-width="1.6"/>
+                  <rect x="13.5" y="3" width="7.5" height="7.5" rx="1.5" fill="rgba(240,90,0,.2)" stroke="#f05a00" stroke-width="1.6"/>
+                  <rect x="3" y="13.5" width="7.5" height="7.5" rx="1.5" fill="rgba(240,90,0,.2)" stroke="#f05a00" stroke-width="1.6"/>
+                  <rect x="13.5" y="13.5" width="7.5" height="7.5" rx="1.5" fill="rgba(240,90,0,.2)" stroke="#f05a00" stroke-width="1.6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="metric-val" id="m-apps">0</div>
+            <div class="metric-lbl" style="color:rgba(255,255,255,.45)">Apps Installed</div>
+            <div class="metric-app-logos" id="metric-app-logos"></div>
+          </div>
+
+          <!-- Devices Linked -->
+          <div class="metric">
+            <div class="metric-top">
+              <div class="metric-icon-pill" style="background:rgba(59,130,246,.15);border:1px solid rgba(59,130,246,.3)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#3b82f6">
+                  <rect x="2" y="4" width="14" height="10" rx="1.5" fill="rgba(59,130,246,.2)" stroke="#3b82f6" stroke-width="1.6"/>
+                  <line x1="1" y1="14" x2="15" y2="14" stroke="#3b82f6" stroke-width="1.6" stroke-linecap="round"/>
+                  <rect x="17" y="7" width="6" height="10" rx="1.5" fill="rgba(59,130,246,.2)" stroke="#3b82f6" stroke-width="1.6"/>
+                  <circle cx="20" cy="15.5" r=".7" fill="#3b82f6"/>
+                </svg>
+              </div>
+            </div>
+            <div class="metric-val" id="m-devs">-</div>
+            <div class="metric-lbl" style="color:rgba(255,255,255,.45)">Devices Linked</div>
+            <div class="metric-device-list" id="metric-device-list">
+              <div class="metric-dev-item">
+                <svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>
+                <span>Loading…</span><div class="mdev-dot"></div>
+              </div>
+            </div>
+          </div>
+
+          <!-- Active Sessions -->
+          <div class="metric">
+            <div class="metric-top">
+              <div class="metric-icon-pill" style="background:rgba(240,90,0,.15);border:1px solid rgba(240,90,0,.25)">
+                <svg viewBox="0 0 24 24" fill="none" stroke="#22c55e">
+                  <path d="M12 2L4 5v6c0 4.4 3.4 8.5 8 9.5 4.6-1 8-5.1 8-9.5V5L12 2z" fill="rgba(240,90,0,.15)" stroke="#f05a00" stroke-width="1.6" stroke-linejoin="round"/>
+                  <polyline points="9 12 11 14 15 10" stroke="#f05a00" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/>
+                </svg>
+              </div>
+            </div>
+            <div class="metric-val" id="m-sess">0</div>
+            <div class="metric-lbl" style="color:rgba(255,255,255,.45)">Active Sessions</div>
+            <div class="metric-app-logos" id="metric-sess-logos"></div>
+          </div>
+        </div>
+      </div>
+
+      <div class="status-bar">
+        <div class="sb-item"><div class="sb-dot" style="background:var(--or);box-shadow:0 0 8px var(--or)"></div>Vault Encrypted</div>
+        <div class="sb-sep"></div>
+        <div class="sb-item"><div class="sb-dot" style="background:var(--bl)"></div>OAuth Active</div>
+        <div class="sb-sep"></div>
+        <div class="sb-item"><div class="sb-dot" style="background:var(--pu)"></div>Token Refresh: Auto</div>
+        <div class="sb-sep"></div>
+        <div class="sb-item"><div class="sb-dot" style="background:var(--ye)"></div>Last sync: Just now</div>
+      </div>
+
+      <div class="sec-row">
+        <div class="sec-title">Priority Apps</div>
+        <div class="sec-link" onclick="openModal()">+ Bring it in</div>
+      </div>
+      <div class="sec-sub">Signed in once — reconnect automatically on every device</div>
+      <div class="apps-grid" id="apps-grid-tier1"></div>
+
+      <div class="sec-row" style="margin-top:28px">
+        <div class="sec-title">Anonymous / One-Tap Convenience</div>
+      </div>
+      <div class="sec-sub">Quick access — you'll confirm sign-in once per device</div>
+      <div class="apps-grid" id="apps-grid-tier23"></div>
+    </div>
+
+    <!-- APP VIEW -->
+    <div class="view gone" id="appview">
+      <div class="av-nav">
+        <button class="navb" onclick="goHome()">
+          <svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M3 9l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2z"/><polyline points="9 22 9 12 15 12 15 22"/></svg>
+        </button>
+        <button class="navb" onclick="if(window.electron)window.electron.navBack()">←</button>
+        <button class="navb" onclick="if(window.electron)window.electron.navForward()">→</button>
+        <div class="url-bar">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-width="1.8"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span id="url-txt">clyx://app</span>
+        </div>
+        <button class="navb" onclick="reloadCurrent()">↻</button>
+      </div>
+      <div class="av-body"><div id="av-content"></div></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ CATALOG MODAL ══ -->
+<div class="overlay gone" id="modal" onclick="closeMBg(event)">
+  <div class="modal">
+    <div class="mh">
+      <h3>App Catalog</h3>
+      <input class="m-search" id="msearch" type="text" placeholder="Search apps…" oninput="renderCatalog()"/>
+      <button class="m-x" onclick="closeModal()">✕</button>
+    </div>
+    <div class="mb">
+      <div class="fchips" id="fchips"></div>
+      <div class="cat-grid" id="cat-grid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ APP TIMINGS MODAL ══ -->
+<div id="timings-modal" class="gone" onclick="closeTMBg(event)">
+  <div class="tm-card">
+    <div class="tm-head">
+      <h3>Screen Time</h3>
+      <div style="font-size:11px;color:var(--w30);margin-left:4px">CLYX · Unified tracking</div>
+      <button class="tm-x" onclick="closeTimings()" style="margin-left:auto">✕</button>
+    </div>
+    <div class="tm-body">
+      <div class="period-tabs" id="period-tabs">
+        <button class="pt on" onclick="setPeriod('day',this)">Today</button>
+        <button class="pt" onclick="setPeriod('week',this)">This Week</button>
+        <button class="pt" onclick="setPeriod('month',this)">This Month</button>
+      </div>
+      <!-- Limit pill -->
+      <div style="display:flex;justify-content:center;margin-bottom:14px">
+        <div class="tm-limit-pill">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg>
+          <span id="tm-limit-text">Limit: 7 Hour 30 Minute</span>
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round"><polyline points="6 9 12 15 18 9"/></svg>
+        </div>
+      </div>
+      <!-- Big clock -->
+      <div class="tm-hero">
+        <div class="tm-clock" id="tm-clock">03:33:14</div>
+        <div class="tm-clock-sub" id="tm-clock-sub">
+          Screen time today
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-linejoin="round" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg>
+        </div>
+      </div>
+      <!-- Progress bar -->
+      <div class="tm-progress-wrap">
+        <div class="tm-progress-label">Progress · <span id="tm-pct">47%</span></div>
+        <div class="tm-prog-track"><div class="tm-prog-fill" id="tm-prog-fill" style="width:47%"></div></div>
+      </div>
+      <!-- 2x2 stat grid -->
+      <div class="tm-grid" id="tm-stat-grid"></div>
+      <!-- 2-col app lists -->
+      <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-bottom:8px">
+        <div class="tm-app-card" id="tm-most-used"></div>
+        <div class="tm-app-card" id="tm-notifs"></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ THEME MODAL ══ -->
+<div id="theme-modal" class="gone" onclick="closeThemeMBg(event)">
+  <div class="th-card">
+    <div class="th-head">
+      <h3>Appearance</h3>
+      <button class="th-x" onclick="closeTheme()">✕</button>
+    </div>
+    <div class="th-body">
+      <div class="th-opt" id="th-dark" onclick="setTheme('dark')">
+        <div class="th-opt-icon"><svg viewBox="0 0 24 24"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>
+        <div class="th-opt-text">
+          <div class="th-opt-name">Dark</div>
+          <div class="th-opt-sub">Dark background, easy on the eyes</div>
+        </div>
+        <div class="th-check"><div class="th-check-dot"></div></div>
+      </div>
+      <div class="th-opt" id="th-light" onclick="setTheme('light')">
+        <div class="th-opt-icon"><svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="5"/><line x1="12" y1="1" x2="12" y2="3"/><line x1="12" y1="21" x2="12" y2="23"/><line x1="4.22" y1="4.22" x2="5.64" y2="5.64"/><line x1="18.36" y1="18.36" x2="19.78" y2="19.78"/><line x1="1" y1="12" x2="3" y2="12"/><line x1="21" y1="12" x2="23" y2="12"/><line x1="4.22" y1="19.78" x2="5.64" y2="18.36"/><line x1="18.36" y1="5.64" x2="19.78" y2="4.22"/></svg></div>
+        <div class="th-opt-text">
+          <div class="th-opt-name">Light</div>
+          <div class="th-opt-sub">Bright and clean interface</div>
+        </div>
+        <div class="th-check"><div class="th-check-dot"></div></div>
+      </div>
+      <div class="th-opt" id="th-system" onclick="setTheme('system')">
+        <div class="th-opt-icon"><svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg></div>
+        <div class="th-opt-text">
+          <div class="th-opt-name">System Default</div>
+          <div class="th-opt-sub">Follows your device preference</div>
+        </div>
+        <div class="th-check"><div class="th-check-dot"></div></div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ══ PROFILE MODAL ══ -->
+<div id="profile-modal" class="gone" onclick="closePMBg(event)">
+  <div class="pm-card">
+    <div class="pm-head">
+      <h3>My Profile</h3>
+      <button class="pm-x" onclick="closeProfile()">✕</button>
+    </div>
+    <div class="pm-body">
+      <!-- Avatar + name row -->
+      <div class="pm-avatar-row">
+        <div class="pm-avatar-wrap" onclick="triggerAvatarUpload()">
+          <div class="pm-avatar" id="pm-avatar-preview">A</div>
+          <div class="pm-avatar-overlay">
+            <svg viewBox="0 0 24 24"><path d="M23 19a2 2 0 01-2 2H3a2 2 0 01-2-2V8a2 2 0 012-2h4l2-3h6l2 3h4a2 2 0 012 2z"/><circle cx="12" cy="13" r="4"/></svg>
+          </div>
+        </div>
+        <input type="file" id="avatar-file-input" accept="image/*" style="display:none" onchange="handleAvatarUpload(this)"/>
+        <div class="pm-avatar-info">
+          <div class="pm-avatar-name" id="pm-display-name">Alex</div>
+          <div class="pm-avatar-email" id="pm-display-email"><a href="/cdn-cgi/l/email-protection" class="__cf_email__" data-cfemail="2e4a4b43416e4d425756004f5e5e">[email&#160;protected]</a></div>
+          <div class="pm-avatar-btns">
+            <button class="pm-avatar-btn primary" onclick="triggerAvatarUpload()">Upload Photo</button>
+            <button class="pm-avatar-btn danger" onclick="removeAvatar()">Remove</button>
+          </div>
+        </div>
+      </div>
+      <div class="pm-divider"></div>
+      <!-- Edit fields -->
+      <div class="pm-field">
+        <label class="pm-label">Full Name</label>
+        <input class="pm-input" id="pm-name-input" type="text" placeholder="Your name"/>
+      </div>
+      <div class="pm-field">
+        <label class="pm-label">Email</label>
+        <input class="pm-input" id="pm-email-input" type="email" placeholder="your@email.com"/>
+      </div>
+      <div class="pm-field">
+        <label class="pm-label">Change Password</label>
+        <input class="pm-input" id="pm-pass-input" type="password" placeholder="New password (leave blank to keep current)"/>
+      </div>
+      <div class="pm-divider"></div>
+      <!-- Stats -->
+      <div class="pm-section-title">Your Space</div>
+      <div class="pm-stat-grid">
+        <div class="pm-stat">
+          <div class="pm-stat-val" id="pm-stat-apps">0</div>
+          <div class="pm-stat-lbl">Apps</div>
+        </div>
+        <div class="pm-stat">
+          <div class="pm-stat-val" id="pm-stat-devs">-</div>
+          <div class="pm-stat-lbl">Devices</div>
+        </div>
+        <div class="pm-stat">
+          <div class="pm-stat-val" id="pm-stat-days">1</div>
+          <div class="pm-stat-lbl">Days Active</div>
+        </div>
+      </div>
+      <button class="pm-save-btn" onclick="saveProfile()">Save Changes</button>
+    </div>
+  </div>
+</div>
+
+<!-- ══ VAULT PIN MODAL ══ -->
+<div id="vault-modal" class="gone" onclick="closeVaultBg(event)">
+  <div class="vault-card">
+    <div class="vault-icon">
+      <svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/><circle cx="12" cy="16" r="1" fill="var(--or)"/></svg>
+    </div>
+    <div class="vault-title">Secret Vault</div>
+    <div class="vault-sub" id="vault-sub-text">Enter your 4-digit PIN to access hidden apps</div>
+    <div class="vault-dots" id="vault-dots">
+      <div class="vault-dot" id="vd0"></div>
+      <div class="vault-dot" id="vd1"></div>
+      <div class="vault-dot" id="vd2"></div>
+      <div class="vault-dot" id="vd3"></div>
+    </div>
+    <div class="vault-error" id="vault-error"></div>
+    <div class="vault-pad">
+      <button class="vault-key" onclick="vaultKey('1')">1</button>
+      <button class="vault-key" onclick="vaultKey('2')">2</button>
+      <button class="vault-key" onclick="vaultKey('3')">3</button>
+      <button class="vault-key" onclick="vaultKey('4')">4</button>
+      <button class="vault-key" onclick="vaultKey('5')">5</button>
+      <button class="vault-key" onclick="vaultKey('6')">6</button>
+      <button class="vault-key" onclick="vaultKey('7')">7</button>
+      <button class="vault-key" onclick="vaultKey('8')">8</button>
+      <button class="vault-key" onclick="vaultKey('9')">9</button>
+      <button class="vault-key del" onclick="vaultClear()">Clear</button>
+      <button class="vault-key" onclick="vaultKey('0')">0</button>
+      <button class="vault-key del" onclick="vaultBack()">⌫</button>
+    </div>
+    <div class="vault-change" id="vault-change-link" onclick="openSetPin()">Set up PIN for first time</div>
+  </div>
+</div>
+
+<!-- ══ VAULT DASHBOARD ══ -->
+<div id="vault-dash" class="gone">
+  <div class="vd-topbar">
+    <div class="vd-topbar-icon"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>
+    <div class="vd-topbar-title">Secret Vault</div>
+    <div class="vd-topbar-badge">🔒 Incognito</div>
+    <div class="vd-topbar-right">
+      <button class="vd-lock-btn" onclick="lockVault()"><svg viewBox="0 0 24 24"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>Lock &amp; Exit</button>
+    </div>
+  </div>
+  <div class="vd-body" id="vd-body"></div>
+</div>
+
+<!-- ══ SETTINGS PANEL ══ -->
+<div id="sp-ov" onclick="closeSettings()"></div>
+<div id="sp">
+  <div class="sp-head">
+    <h3>Settings</h3>
+    <button class="sp-cls" onclick="closeSettings()">
+      <svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+    </button>
+  </div>
+  <div class="sp-body" id="sp-body"></div>
+</div>
+
+<div id="toasts"></div>
+
+<script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script data-cfasync="false" src="/cdn-cgi/scripts/5c5dd728/cloudflare-static/email-decode.min.js"></script><script>
+// ── CLYX CONFIG ───────────────────────────────────────────────────────────────
+const API_BASE = 'http://localhost:4001/api';
+
+// ── CATALOG ────────────────────────────────────────────────────────────────
+// tier 1  = real OAuth + refresh tokens -> silent reconnect on login, no re-auth ever needed
+// tier 2  = OAuth exists but scopes are limited -> partial live data only
+// tier 3  = no usable OAuth for personal browsing -> one-click launch + autofill at best
+const APPS=[
+  {id:'gmail',    name:'Gmail',     domain:'gmail.com',        cat:'Productivity',auth:'OAuth',   color:'#EA4335', tier:1},
+  {id:'gdrive',   name:'Drive',     domain:'drive.google.com', cat:'Productivity',auth:'OAuth',   color:'#4285F4', tier:1},
+  {id:'spotify',  name:'Spotify',   domain:'spotify.com',      cat:'Media',       auth:'OAuth',   color:'#1DB954', tier:1},
+  {id:'twitch',   name:'Twitch',    domain:'twitch.tv',        cat:'Media',       auth:'OAuth',   color:'#9146FF', tier:1},
+  {id:'discord',  name:'Discord',   domain:'discord.com',      cat:'Social',      auth:'OAuth',   color:'#5865F2', tier:1},
+  {id:'reddit',   name:'Reddit',    domain:'reddit.com',       cat:'Social',      auth:'OAuth',   color:'#FF4500', tier:1},
+  {id:'github',   name:'GitHub',    domain:'github.com',       cat:'Dev',         auth:'OAuth',   color:'#FFFFFF', tier:1},
+  {id:'figma',    name:'Figma',     domain:'figma.com',        cat:'Dev',         auth:'OAuth',   color:'#F24E1E', tier:1},
+  {id:'notion',   name:'Notion',    domain:'notion.so',        cat:'Productivity',auth:'OAuth',   color:'#FFFFFF', tier:1},
+  {id:'slack',    name:'Slack',     domain:'slack.com',        cat:'Productivity',auth:'OAuth',   color:'#4A154B', tier:1},
+  {id:'trello',   name:'Trello',    domain:'trello.com',       cat:'Productivity',auth:'OAuth',   color:'#0079BF', tier:1},
+  {id:'dropbox',  name:'Dropbox',   domain:'dropbox.com',      cat:'Productivity',auth:'OAuth',   color:'#0061FF', tier:1},
+
+  {id:'twitter',  name:'X',         domain:'twitter.com',      cat:'Social',      auth:'OAuth',   color:'#1DA1F2', tier:2},
+  {id:'linkedin', name:'LinkedIn',  domain:'linkedin.com',     cat:'Social',      auth:'OAuth',   color:'#0A66C2', tier:2},
+  {id:'instagram',name:'Instagram', domain:'instagram.com',    cat:'Social',      auth:'Session', color:'#E1306C', tier:2},
+
+  {id:'youtube',  name:'YouTube',   domain:'youtube.com',      cat:'Media',       auth:'Session', color:'#FF0000', tier:3},
+  {id:'netflix',  name:'Netflix',   domain:'netflix.com',      cat:'Media',       auth:'Session', color:'#E50914', tier:3},
+  {id:'whatsapp', name:'WhatsApp',  domain:'web.whatsapp.com', cat:'Social',      auth:'Session', color:'#25D366', tier:3},
+];
+const CATS=['All',...[...new Set(APPS.map(a=>a.cat))]];
+const logo=d=>`https://www.google.com/s2/favicons?domain=${d}&sz=128`;
+
+// ── STATE ──────────────────────────────────────────────────────────────────
+const SK='clyx_v4';
+let S={user:null,apps:[],tabs:[],activeTab:null};
+const save=()=>localStorage.setItem(SK,JSON.stringify(S));
+const load=()=>{try{const x=localStorage.getItem(SK);if(x)S=JSON.parse(x)}catch(e){}};
+
+// ── BOOT ───────────────────────────────────────────────────────────────────
+window.addEventListener('load',()=>{
+  load();
+  setTimeout(()=>{
+    document.getElementById('ld').classList.add('gone');
+    if(S.user){
+      // Refresh apps from backend if we have a token
+      const tok = localStorage.getItem('clyx_access_token');
+      if(tok){
+        fetch(API_BASE+'/apps',{ headers:{'Authorization':'Bearer '+tok} })
+          .then(r=>r.json())
+          .then(d=>{
+            if(d.success && d.apps && d.apps.length){
+              S.apps = d.apps.map(a=>({
+                id: a.app_id||a.appId, name:a.name,
+                domain:a.domain||'', cat:a.category||'Other',
+                auth:a.auth_type||'OAuth', tier: a.tier||3, color:'#f05a00'
+              }));
+              save();
+            }
+          }).catch(()=>{})
+          .finally(()=>{ enter(); });
+      } else { enter(); }
+    } else {
+      document.getElementById('auth').classList.remove('gone');
+    }
+  },2000);
+});
+
+// ── AUTH ───────────────────────────────────────────────────────────────────
+function setAuthTab(t,btn){
+  document.querySelectorAll('.seg-b').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  document.getElementById('f-in').style.display=t==='in'?'':'none';
+  document.getElementById('f-up').style.display=t==='up'?'':'none';
+}
+function seed(){
+  if(!S.apps.length)['youtube','gmail','spotify','discord','github'].forEach(id=>{
+    const a=APPS.find(x=>x.id===id);if(a)S.apps.push({...a});
+  });
+}
+function doLogin(e){
+  ripple(e);
+  const email = document.getElementById('li-e').value.trim();
+  const pass  = document.getElementById('li-p').value;
+  if(!email||!pass){ toast('Please fill all fields','e'); return; }
+
+  // Try backend first, fall back to local if backend not running
+  fetch(API_BASE+'/auth/login', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ email, password: pass, deviceId: localStorage.getItem('clyx_device_id') })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(d.success){
+      // Store tokens
+      localStorage.setItem('clyx_access_token',  d.accessToken);
+      localStorage.setItem('clyx_refresh_token',  d.refreshToken);
+      localStorage.setItem('clyx_device_id',      d.deviceId);
+      // Restore user
+      S.user = { email: d.user.email, name: d.user.name, avatar: d.user.name[0].toUpperCase(),
+                 avatarColor: d.user.avatarColor||'#f05a00', joinedAt: Date.now() };
+      // Load apps from backend
+      return fetch(API_BASE+'/apps', { headers:{'Authorization':'Bearer '+d.accessToken} })
+        .then(r=>r.json()).then(ad=>{
+          if(ad.success && ad.apps.length){
+            S.apps = ad.apps.map(a=>({ id:a.app_id||a.appId, name:a.name, domain:a.domain||'',
+              cat:a.category||'Other', auth:a.auth_type||'OAuth', color:'#f05a00' }));
+          } else { if(!S.apps.length) seed(); }
+          save(); document.getElementById('auth').classList.add('gone');
+          enter(); toast('Welcome back, '+S.user.name.split(' ')[0]+' ✓','s');
+        });
+    } else { throw new Error(d.message||'Invalid credentials'); }
+  })
+  .catch(err=>{
+    // Backend not running — local login
+    if(err.message&&!err.message.includes('fetch')&&!err.message.includes('Failed')){ toast(err.message,'e'); return; }
+    const n = email.split('@')[0];
+    S.user = { email, name: n.charAt(0).toUpperCase()+n.slice(1), avatar: n[0].toUpperCase(), joinedAt: Date.now() };
+    if(!S.apps.length) seed();
+    save(); document.getElementById('auth').classList.add('gone');
+    enter(); toast('Signed in (offline mode)','s');
+  });
+}
+function doSignup(e){
+  ripple(e);
+  const name  = document.getElementById('su-n').value.trim();
+  const email = document.getElementById('su-e').value.trim();
+  const pass  = document.getElementById('su-p').value;
+  if(!name||!email||!pass){ toast('All fields required','e'); return; }
+  if(pass.length<8){ toast('Password min 8 chars','e'); return; }
+
+  fetch(API_BASE+'/auth/signup', {
+    method:'POST', headers:{'Content-Type':'application/json'},
+    body: JSON.stringify({ name, email, password: pass })
+  })
+  .then(r=>r.json())
+  .then(d=>{
+    if(d.success){
+      localStorage.setItem('clyx_access_token', d.accessToken);
+      localStorage.setItem('clyx_refresh_token', d.refreshToken);
+      localStorage.setItem('clyx_device_id',     d.deviceId);
+      S.user = { email, name, avatar: name[0].toUpperCase(), avatarColor:'#f05a00', joinedAt: Date.now() };
+      S.apps = []; seed();
+      // Save default apps to backend
+      S.apps.forEach(app=>{
+        fetch(API_BASE+'/apps',{ method:'POST', headers:{'Content-Type':'application/json','Authorization':'Bearer '+d.accessToken},
+          body: JSON.stringify({ appId:app.id, name:app.name, domain:app.domain||'', category:app.cat||'Other', authType:app.auth||'OAuth' })
+        }).catch(()=>{});
+      });
+      save(); document.getElementById('auth').classList.add('gone');
+      enter(); toast('Universe created — welcome, '+name.split(' ')[0]+' ✓','s');
+    } else { throw new Error(d.message||'Signup failed'); }
+  })
+  .catch(err=>{
+    if(err.message&&!err.message.includes('fetch')&&!err.message.includes('Failed')){ toast(err.message,'e'); return; }
+    // Offline fallback
+    S.user = { email, name, avatar: name[0].toUpperCase(), joinedAt: Date.now() };
+    S.apps = []; seed(); save();
+    document.getElementById('auth').classList.add('gone');
+    enter(); toast('Account created (offline mode)','s');
+  });
+}
+function doGoogle(e){
+  ripple(e);
+  // Electron: Start the OAuth 2.0 flow with local callback server
+  if (window.electron && window.electron.startGoogleAuth) {
+    window.electron.startGoogleAuth();
+    // Show the waiting panel
+    document.getElementById('f-in').style.display = 'none';
+    document.getElementById('f-up').style.display = 'none';
+    document.getElementById('f-google-divider').style.display = 'none';
+    document.getElementById('btn-google-main').style.display = 'none';
+    document.querySelector('.seg').style.display = 'none';
+    document.getElementById('f-google').style.display = '';
+
+    // Listen for the OAuth result from the main process
+    if (window.electron.onGoogleAuthResult) {
+      window.electron.onGoogleAuthResult((data) => {
+        if (data.success) {
+          // Store tokens
+          localStorage.setItem('clyx_access_token',  data.accessToken);
+          localStorage.setItem('clyx_refresh_token', data.refreshToken);
+          localStorage.setItem('clyx_device_id',     data.deviceId);
+          // Set user state
+          S.user = {
+            email:       data.user.email,
+            name:        data.user.name,
+            avatar:      (data.user.name || 'G')[0].toUpperCase(),
+            avatarColor: data.user.avatarColor || '#f05a00',
+            joinedAt:    Date.now(),
+          };
+          if (!S.apps.length) seed();
+          save();
+          document.getElementById('auth').classList.add('gone');
+          enter();
+          toast('Signed in with Google ✓', 's');
+        } else {
+          // Auth failed or cancelled
+          toast(data.error || 'Google sign-in failed', 'e');
+          cancelGoogleAuth();
+        }
+      });
+    }
+    return;
+  }
+  // Web fallback: simulate Google SSO with email
+  const email = prompt('Enter your Google email to continue:');
+  if (!email || !email.includes('@')) { toast('Invalid email','e'); return; }
+  const n = email.split('@')[0];
+  S.user = { email, name: n.charAt(0).toUpperCase()+n.slice(1), avatar: n[0].toUpperCase(), joinedAt: Date.now() };
+  S.apps = []; seed(); save();
+  document.getElementById('auth').classList.add('gone');
+  enter(); toast('Signed in with Google ✓','s');
+}
+function completeGoogleAuth(e){
+  // This function is now handled automatically via IPC callback
+  // Kept as a no-op for backward compatibility
+  if(e) ripple(e);
+}
+function cancelGoogleAuth(){
+  // Restore original auth form
+  document.getElementById('f-google').style.display = 'none';
+  document.getElementById('f-in').style.display = '';
+  document.getElementById('f-up').style.display = 'none';
+  document.getElementById('f-google-divider').style.display = '';
+  document.getElementById('btn-google-main').style.display = '';
+  document.querySelector('.seg').style.display = '';
+  document.querySelectorAll('.seg-b').forEach((b,i) => { b.classList.toggle('on', i===0); });
+}
+function doLogout(){
+  const tok = localStorage.getItem('clyx_refresh_token');
+  if(tok){
+    fetch(API_BASE+'/auth/logout',{ method:'POST',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+(localStorage.getItem('clyx_access_token')||'')},
+      body: JSON.stringify({ refreshToken: tok })
+    }).catch(()=>{});
+  }
+  localStorage.removeItem('clyx_access_token');
+  localStorage.removeItem('clyx_refresh_token');
+  S={user:null,apps:[],tabs:[],activeTab:null};
+  save();
+  document.getElementById('app').classList.add('gone');
+  document.getElementById('auth').classList.remove('gone');
+  cancelGoogleAuth(); // Reset Google auth panel if active
+  document.getElementById('f-in').style.display='';
+  document.getElementById('f-up').style.display='none';
+  if(window.electron) window.electron.closeView();
+  toast('Signed out','i');
+}
+function enter(){
+  document.getElementById('app').classList.remove('gone');
+  const initial = (S.user.name||'U')[0].toUpperCase();
+  const color   = S.user.avatarColor || '#f05a00';
+  // Check for saved avatar photo
+  const savedImg = localStorage.getItem('clyx_avatar_img');
+  const avBtn = document.getElementById('av-btn');
+  const avPic = document.getElementById('av-pic');
+  if(savedImg){
+    const imgTag = `<img src="${savedImg}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`;
+    if(avBtn) avBtn.innerHTML = imgTag;
+    if(avPic) avPic.innerHTML = imgTag;
+  } else {
+    if(avBtn){ avBtn.textContent=initial; avBtn.style.background=color; }
+    if(avPic){ avPic.textContent=initial; avPic.style.background=color; }
+  }
+  document.getElementById('uname').textContent = (S.user.name||'User').split(' ')[0];
+  document.getElementById('av-name').textContent  = S.user.name||'User';
+  document.getElementById('av-email').textContent = S.user.email||'';
+  renderDash(); renderTabs(); goHome();
+  // Fetch real device data from backend
+  fetchDevices().then(devs => updateDeviceUI(devs));
+}
+
+// ── DASHBOARD ──────────────────────────────────────────────────────────────
+function renderDash(){
+  const gridT1=document.getElementById('apps-grid-tier1');
+  const gridT23=document.getElementById('apps-grid-tier23');
+  gridT1.innerHTML=''; gridT23.innerHTML='';
+
+  const cardFor=app=>{
+    const d=document.createElement('div');
+    d.className='acard rh';
+    d.onclick=e=>{ripple(e);openApp(app.id)};
+    const badge = app.tier===1
+      ? `<div class="acard-online" title="Auto-reconnects on login"></div>`
+      : `<div class="acard-online" style="background:var(--ye)" title="One-tap sign-in per device"></div>`;
+    d.innerHTML=`
+      <div class="acard-logo"><img src="${logo(app.domain)}" alt="${app.name}" onerror="this.style.opacity='.25'"/></div>
+      <div class="acard-name">${app.name}</div>
+      ${badge}
+      <button class="acard-rm" onclick="removeApp(event,'${app.id}')">
+        <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+      </button>`;
+    return d;
+  };
+
+  S.apps.forEach(app=>{
+    const target = app.tier===1 ? gridT1 : gridT23;
+    target.appendChild(cardFor(app));
+  });
+
+  const add=document.createElement('div');
+  add.className='add-card rh';
+  add.onclick=e=>{ripple(e);openModal()};
+  add.innerHTML=`<div class="add-card-ring"><svg viewBox="0 0 24 24" fill="none" stroke-width="2" stroke-linecap="round"><line x1="12" y1="5" x2="12" y2="19"/><line x1="5" y1="12" x2="19" y2="12"/></svg></div><span>Bring it in</span>`;
+  gridT1.appendChild(add);
+  document.getElementById('m-apps').textContent=S.apps.length;
+  document.getElementById('m-sess').textContent=S.apps.length;
+
+  // Populate app logo strips in metric cards
+  const logoStrip = (elId, apps, maxShow=5) => {
+    const el = document.getElementById(elId);
+    if(!el) return;
+    const show = apps.slice(0, maxShow);
+    const rest = apps.length - maxShow;
+    el.innerHTML = show.map(app =>
+      `<div class="metric-app-logo" title="${app.name}">
+        <img src="${logo(app.domain)}" alt="${app.name}" onerror="this.style.opacity=0.2"/>
+      </div>`
+    ).join('') + (rest > 0
+      ? `<div class="metric-app-logo-more">+${rest}</div>`
+      : '');
+  };
+  logoStrip('metric-app-logos',  S.apps);
+  logoStrip('metric-sess-logos', S.apps);
+}
+
+// ── TABS ───────────────────────────────────────────────────────────────────
+function renderTabs(){
+  const w=document.getElementById('tab-scroll');w.innerHTML='';
+  S.tabs.forEach(tab=>{
+    const app=APPS.find(a=>a.id===tab.appId)||S.apps.find(a=>a.id===tab.appId);
+    const el=document.createElement('div');
+    el.className='tab'+(S.activeTab===tab.id?' on':'');
+    el.onclick=()=>activateTab(tab.id);
+    const ico=app?.domain?`<img class="tab-ico" src="${logo(app.domain)}" alt="" onerror="this.style.display='none'"/>`:''
+    el.innerHTML=`<div class="tab-dot"></div>${ico}<span class="tab-lbl">${tab.name}</span><button class="tab-x" onclick="closeTab(event,'${tab.id}')">✕</button>`;
+    w.appendChild(el);
+  });
+}
+function openApp(appId){
+  const app=APPS.find(a=>a.id===appId)||S.apps.find(a=>a.id===appId);if(!app)return;
+  let tab=S.tabs.find(t=>t.appId===appId);
+  if(!tab){tab={id:'t'+Date.now(),appId,name:app.name};S.tabs.push(tab);}
+  S.activeTab=tab.id;save();renderTabs();showAppView(app);
+  trackAppOpen(appId);
+}
+function activateTab(id){
+  // Close any open BrowserView before switching — prevents it persisting over new tab
+  if(S.activeTab && S.activeTab !== id){
+    if(window.electron) window.electron.closeView();
+    if(window.clyx?.view) window.clyx.view.close();
+    const av = document.getElementById('av-content');
+    if(av) av.innerHTML = '';
+  }
+  S.activeTab=id; save(); renderTabs();
+  const tab=S.tabs.find(t=>t.id===id);
+  if(tab){ const a=APPS.find(a=>a.id===tab.appId)||S.apps.find(a=>a.id===tab.appId); if(a) showAppView(a); }
+}
+function closeTab(e,id){
+  e.stopPropagation();
+  // If closing the currently active tab, destroy BrowserView first
+  if(S.activeTab===id){
+    trackAppClose();
+    if(window.electron) window.electron.closeView();
+    if(window.clyx?.view) window.clyx.view.close();
+    const av = document.getElementById('av-content');
+    if(av) av.innerHTML = '';
+  }
+  S.tabs=S.tabs.filter(t=>t.id!==id);
+  if(S.activeTab===id) S.activeTab=S.tabs.length?S.tabs[S.tabs.length-1].id:null;
+  save(); renderTabs();
+  if(S.activeTab){ const tab=S.tabs.find(t=>t.id===S.activeTab); if(tab){const a=APPS.find(a=>a.id===tab.appId)||S.apps.find(a=>a.id===tab.appId);if(a){showAppView(a);trackAppOpen(a.id);}} }
+  else{ document.getElementById('dash').classList.remove('gone'); document.getElementById('appview').classList.add('gone'); }
+}
+function goHome(){
+  trackAppClose();
+  // Close BrowserView (Electron) — it's a native layer, must be explicitly destroyed
+  if(window.electron) window.electron.closeView();
+  if(window.clyx?.view) window.clyx.view.close();
+  S.activeTab=null; save(); renderTabs();
+  document.getElementById('dash').classList.remove('gone');
+  document.getElementById('appview').classList.add('gone');
+  // Wipe app content so old page doesn't ghost when reopening
+  const av = document.getElementById('av-content');
+  if(av) av.innerHTML = '';
+}
+function showAppView(app){
+  document.getElementById('dash').classList.add('gone');
+  document.getElementById('appview').classList.remove('gone');
+  const appUrl = app.domain ? 'https://'+app.domain : '';
+  document.getElementById('url-txt').textContent = appUrl || 'clyx://'+app.id;
+  const tier = app.tier || 3;
+
+  // ── TIER 1 (real OAuth on file with CLYX): embed normally ──────────────────
+  // These apps reconnect via the backend's stored refresh token — no cookie
+  // tricks, no fingerprint spoofing. If the embedded page still shows a login
+  // screen (e.g. token expired), the sign-in hint sends the user to their
+  // real system browser to redo it, same as any other website.
+  if (window.electron && appUrl && tier === 1) {
+    document.getElementById('av-content').innerHTML=`
+      <div class="app-mock" id="av-loading">
+        <div class="am-logo"><img src="${logo(app.domain)}" onerror="this.style.opacity=0.2"/></div>
+        <div class="am-name">${app.name}</div>
+        <div class="am-badge">Priority app · reconnects automatically</div>
+        <div class="am-spinner" style="margin-top:8px"></div>
+      </div>`;
+    const tb = document.getElementById('tb') || document.querySelector('.tb')
+    const av = document.getElementById('appview')
+    const navBar = av ? av.querySelector('.av-nav') : null
+    const tbH  = tb  ? tb.getBoundingClientRect().height  : 50
+    const navH = navBar ? navBar.getBoundingClientRect().height : 46
+    const totalH = Math.round(tbH + navH)
+    if (window.electron.setTopbar) window.electron.setTopbar(totalH)
+    window.electron.openURL(appUrl, totalH).then(()=>{
+      const el=document.getElementById('av-loading');
+      if(el) el.style.visibility='hidden';
+    });
+    window.electron.onNavUrl(u=>{
+      document.getElementById('url-txt').textContent=u;
+    });
+    window.electron.onNavLoad(l=>{
+      const e=document.getElementById('url-txt');
+      if(e) e.style.opacity=l?'0.45':'1';
+    });
+    window.electron.onNavLoad(loading=>{
+      if(!loading){
+        const url = document.getElementById('url-txt')?.textContent||'';
+        const needsSignin = url.includes('accounts.google.com')||url.includes('login')||url.includes('signin');
+        if(needsSignin){
+          showSigninHint('Needs sign-in — opens in your real browser for security. Come back here when done.');
+        }
+      }
+    });
+    if(window.electron.onSigninComplete){
+      window.electron.onSigninComplete(()=>{
+        toast('Welcome back — refreshing the page ✓','s');
+      });
+    }
+    return;
+  }
+
+  // ── TIER 2/3 (no full-account OAuth available): launch externally ─────────
+  // We don't embed or spoof these — the real login has to happen in a real
+  // browser, so CLYX just hands off to it.
+  if (appUrl && tier !== 1) {
+    document.getElementById('av-content').innerHTML=`<div class="app-mock">
+      <div class="am-logo"><img src="${logo(app.domain)}" onerror="this.style.opacity=0.2"/></div>
+      <div class="am-name">${app.name}</div>
+      <div class="am-badge">One-tap convenience · opens in your browser</div>
+      <div class="am-desc">${app.name} opens in your default browser so sign-in works exactly like it normally would.</div>
+      <button class="am-btn rh" onclick="launchExternally('${appUrl}')">
+        Open ${app.name}
+      </button>
+    </div>`;
+    launchExternally(appUrl);
+    return;
+  }
+
+  // ── Fallback: nothing to embed or launch ───────────────────────────────────
+  document.getElementById('av-content').innerHTML=`<div class="app-mock">
+    <div class="am-logo"><img src="${logo(app.domain)}" onerror="this.style.opacity=0.2"/></div>
+    <div class="am-name">${app.name}</div>
+    <div class="am-desc">This app doesn't have a launch URL configured yet.</div>
+  </div>`;
+}
+
+function launchExternally(url){
+  if (window.electron?.openExternal) window.electron.openExternal(url);
+  else window.open(url, '_blank');
+}
+
+function reloadCurrent(){
+  if(window.electron){ window.electron.navReload(); return; }
+  const tab=S.tabs.find(t=>t.id===S.activeTab);
+  if(tab){ const app=APPS.find(a=>a.id===tab.appId)||S.apps.find(a=>a.id===tab.appId); if(app)showAppView(app); }
+}
+
+
+// ── CATALOG ────────────────────────────────────────────────────────────────
+let catF='All';
+function openModal(){
+  // Close any open app before showing catalog
+  if(window.electron) window.electron.closeView();
+  if(window.clyx?.view) window.clyx.view.close();
+  const av=document.getElementById('av-content'); if(av) av.innerHTML='';
+  document.getElementById('dash').classList.remove('gone');
+  document.getElementById('appview').classList.add('gone');
+  S.activeTab=null; save(); renderTabs();
+  document.getElementById('modal').classList.remove('gone');
+  renderFChips(); renderCatalog();
+}
+function closeModal(){document.getElementById('modal').classList.add('gone');}
+function closeMBg(e){if(e.target===e.currentTarget)closeModal();}
+function renderFChips(){
+  document.getElementById('fchips').innerHTML=CATS.map(c=>
+    `<button class="fchip${catF===c?' on':''}" onclick="setCatF('${c}',this)">${c}</button>`
+  ).join('');
+}
+function setCatF(c){catF=c;renderFChips();renderCatalog();}
+function renderCatalog(){
+  const q=document.getElementById('msearch').value.toLowerCase();
+  const ins=S.apps.map(a=>a.id);
+  const list=APPS.filter(a=>(!q||a.name.toLowerCase().includes(q)||a.cat.toLowerCase().includes(q))&&(catF==='All'||a.cat===catF));
+  if(!list.length){document.getElementById('cat-grid').innerHTML='<div style="grid-column:1/-1;padding:32px;text-align:center;color:rgba(255,255,255,.15);font-size:13px">No apps found</div>';return;}
+  const ii=id=>ins.includes(id);
+  document.getElementById('cat-grid').innerHTML=list.map(app=>`
+    <div class="ci${ii(app.id)?' ins':''}">
+      <div class="ci-logo"><img src="${logo(app.domain)}" alt="${app.name}" style="width:40px;height:40px;object-fit:contain" onerror="this.style.opacity='.2'"/></div>
+      <div class="ci-name">${app.name}</div>
+      <div class="ci-cat">${app.cat}</div>
+      ${ii(app.id)?'<div class="ci-ck">✓</div>':''}
+      <button class="ci-btn${ii(app.id)?' ib2':''}" onclick="${ii(app.id)?`openFromCat('${app.id}')`:`installApp('${app.id}')`}">
+        ${ii(app.id)?'Open':'+ Install'}
+      </button>
+    </div>`).join('');
+}
+function installApp(id){
+  const app=APPS.find(a=>a.id===id);if(!app)return;
+  if(S.apps.find(a=>a.id===id)){toast(app.name+' already installed','i');return;}
+  S.apps.push({...app});save();renderDash();renderCatalog();
+  toast(app.name+' installed · session synced','s');
+}
+function openFromCat(id){closeModal();openApp(id);}
+function removeApp(e,id){
+  e.stopPropagation();
+  const app=S.apps.find(a=>a.id===id); if(!app) return;
+  // Close BrowserView if this app is open
+  if(S.activeTab){
+    const tab=S.tabs.find(t=>t.id===S.activeTab);
+    if(tab&&tab.appId===id){
+      if(window.electron) window.electron.closeView();
+      const av=document.getElementById('av-content'); if(av) av.innerHTML='';
+    }
+  }
+  S.apps=S.apps.filter(a=>a.id!==id);
+  S.tabs=S.tabs.filter(t=>t.appId!==id);
+  if(S.activeTab&&!S.tabs.find(t=>t.id===S.activeTab)) S.activeTab=null;
+  save(); renderDash(); renderTabs();
+  if(!S.tabs.length) goHome();
+  toast(app.name+' removed','i');
+  // Sync to backend
+  const tok = localStorage.getItem('clyx_access_token');
+  if(tok){
+    fetch(API_BASE+'/apps/'+id,{ method:'DELETE',
+      headers:{'Authorization':'Bearer '+tok}
+    }).catch(()=>{});
+  }
+}
+
+// ── USAGE TRACKING SYSTEM ──────────────────────────────────────────────────
+const USAGE_LOG_KEY = 'clyx_usage_log';
+const USAGE_PICKUPS_KEY = 'clyx_usage_pickups';
+let _currentSession = null; // { appId, startTime }
+
+function getUsageLog(){
+  try { return JSON.parse(localStorage.getItem(USAGE_LOG_KEY)||'[]'); } catch(e){ return []; }
+}
+function saveUsageLog(log){ localStorage.setItem(USAGE_LOG_KEY, JSON.stringify(log)); }
+function getPickups(){
+  try { return JSON.parse(localStorage.getItem(USAGE_PICKUPS_KEY)||'[]'); } catch(e){ return []; }
+}
+function savePickups(p){ localStorage.setItem(USAGE_PICKUPS_KEY, JSON.stringify(p)); }
+
+function trackAppOpen(appId){
+  // End any current session first
+  trackAppClose();
+  _currentSession = { appId, startTime: Date.now() };
+  // Record a pickup event
+  const pickups = getPickups();
+  pickups.push({ appId, time: Date.now() });
+  savePickups(pickups);
+}
+
+function trackAppClose(){
+  if(!_currentSession) return;
+  const log = getUsageLog();
+  log.push({
+    appId: _currentSession.appId,
+    start: _currentSession.startTime,
+    end: Date.now()
+  });
+  saveUsageLog(log);
+  _currentSession = null;
+}
+
+function getFilteredUsage(period){
+  const log = getUsageLog();
+  const now = Date.now();
+  const dayStart = new Date(); dayStart.setHours(0,0,0,0);
+  const weekStart = new Date(dayStart); weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+  const monthStart = new Date(dayStart); monthStart.setDate(1);
+  let cutoff;
+  if(period==='day') cutoff = dayStart.getTime();
+  else if(period==='week') cutoff = weekStart.getTime();
+  else cutoff = monthStart.getTime();
+  // Include current session if active
+  let entries = log.filter(e => e.end >= cutoff);
+  if(_currentSession && _currentSession.startTime >= cutoff){
+    entries.push({ appId: _currentSession.appId, start: _currentSession.startTime, end: now });
+  } else if(_currentSession){
+    entries.push({ appId: _currentSession.appId, start: Math.max(_currentSession.startTime, cutoff), end: now });
+  }
+  return { entries, cutoff };
+}
+
+function getFilteredPickups(period){
+  const pickups = getPickups();
+  const now = Date.now();
+  const dayStart = new Date(); dayStart.setHours(0,0,0,0);
+  const weekStart = new Date(dayStart); weekStart.setDate(weekStart.getDate() - weekStart.getDay());
+  const monthStart = new Date(dayStart); monthStart.setDate(1);
+  let cutoff;
+  if(period==='day') cutoff = dayStart.getTime();
+  else if(period==='week') cutoff = weekStart.getTime();
+  else cutoff = monthStart.getTime();
+  return pickups.filter(p => p.time >= cutoff);
+}
+
+// ── APP TIMINGS ────────────────────────────────────────────────────────────
+let tmPeriod='day';
+function fmtHM(h){const hr=Math.floor(h);const mn=Math.round((h-hr)*60);return hr>0&&mn>0?hr+'h '+mn+'m':hr>0?hr+'h':mn>0?mn+'m':'0m';}
+function fmtHMS(h){const hr=Math.floor(h);const mn=Math.floor((h-hr)*60);const sc=Math.floor(((h-hr)*60-mn)*60);return String(hr).padStart(2,'0')+':'+String(mn).padStart(2,'0')+':'+String(sc).padStart(2,'0');}
+function fmtTime(ts){ const d=new Date(ts); return String(d.getHours()).padStart(2,'0')+':'+String(d.getMinutes()).padStart(2,'0'); }
+function openTimings(){
+  document.getElementById('timings-modal').classList.remove('gone');
+  renderTimings();
+}
+function closeTimings(){document.getElementById('timings-modal').classList.add('gone');}
+function closeTMBg(e){if(e.target===e.currentTarget)closeTimings();}
+function setPeriod(p,btn){
+  tmPeriod=p;
+  document.querySelectorAll('.pt').forEach(b=>b.classList.remove('on'));
+  btn.classList.add('on');
+  renderTimings();
+}
+function renderTimings(){
+  const installedApps=S.apps.length?S.apps:APPS.slice(0,6);
+  const { entries, cutoff } = getFilteredUsage(tmPeriod);
+  const filteredPickups = getFilteredPickups(tmPeriod);
+
+  // Calculate per-app usage in hours
+  const appUsageMs = {};
+  entries.forEach(e => {
+    const clampedStart = Math.max(e.start, cutoff);
+    const dur = e.end - clampedStart;
+    if(dur > 0) appUsageMs[e.appId] = (appUsageMs[e.appId]||0) + dur;
+  });
+  const usageData = installedApps.map(app => ({
+    app, hours: (appUsageMs[app.id]||0) / 3600000
+  })).sort((a,b) => b.hours - a.hours);
+  const totalH = usageData.reduce((s,u) => s + u.hours, 0);
+
+  const limits={day:7.5,week:52.5,month:210};
+  const limit=limits[tmPeriod];
+  const pct=totalH > 0 ? Math.min(99,Math.round((totalH/limit)*100)) : 0;
+  document.getElementById('tm-clock').textContent=fmtHMS(totalH);
+  const subLabel=tmPeriod==='day'?'Screen time today':tmPeriod==='week'?'Screen time this week':'Screen time this month';
+  document.getElementById('tm-clock-sub').innerHTML=subLabel+' <svg viewBox="0 0 24 24" width="12" height="12" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" style="vertical-align:middle"><polyline points="9 18 15 12 9 6"/></svg>';
+  const limitLabels={day:'7 Hour 30 Minute',week:'52 Hour 30 Minute',month:'210 Hours'};
+  document.getElementById('tm-limit-text').textContent='Limit: '+limitLabels[tmPeriod];
+  document.getElementById('tm-pct').textContent=pct+'%';
+  document.getElementById('tm-prog-fill').style.width=pct+'%';
+
+  // Real pickups count
+  const pickups = filteredPickups.length;
+
+  // Average use per session (in minutes)
+  const sessionCount = entries.length || 1;
+  const totalMs = entries.reduce((s,e) => s + Math.max(0, e.end - Math.max(e.start, cutoff)), 0);
+  const avgMin = Math.round((totalMs / sessionCount) / 60000);
+
+  // Continuous use: find longest single session
+  let longestSession = { dur: 0, start: 0, end: 0 };
+  entries.forEach(e => {
+    const dur = e.end - Math.max(e.start, cutoff);
+    if(dur > longestSession.dur) longestSession = { dur, start: Math.max(e.start, cutoff), end: e.end };
+  });
+  const contHr = Math.floor(longestSession.dur / 3600000);
+  const contMin = Math.floor((longestSession.dur % 3600000) / 60000);
+  const contRange = longestSession.dur > 0 ? fmtTime(longestSession.start)+' – '+fmtTime(longestSession.end) : '—';
+
+  // Longest off-screen gap between consecutive sessions
+  const sorted = [...entries].sort((a,b) => a.start - b.start);
+  let longestGap = { dur: 0, start: 0, end: 0 };
+  for(let i = 1; i < sorted.length; i++){
+    const gap = sorted[i].start - sorted[i-1].end;
+    if(gap > longestGap.dur) longestGap = { dur: gap, start: sorted[i-1].end, end: sorted[i].start };
+  }
+  const offHr = Math.floor(longestGap.dur / 3600000);
+  const offMin = Math.floor((longestGap.dur % 3600000) / 60000);
+  const offRange = longestGap.dur > 0 ? fmtTime(longestGap.start)+' – '+fmtTime(longestGap.end) : '—';
+
+  // Last drop-off and first pickup from real data
+  const lastDrop = sorted.length > 0 ? fmtTime(sorted[sorted.length-1].end) : '—';
+  const periodPickups = filteredPickups.sort((a,b) => a.time - b.time);
+  const firstPick = periodPickups.length > 0 ? fmtTime(periodPickups[0].time) : '—';
+
+  const stats=[
+    {title:'Pickups',body:'<div class="tm-stat-val"><span class="tm-stat-num">'+pickups+'</span><span class="tm-stat-unit">times</span></div>',
+     icon:'<div class="tm-stat-icon" style="background:rgba(150,120,255,.12)"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(150,120,255,.85)" stroke-width="1.8" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg></div>'},
+    {title:'Average use',body:'<div class="tm-stat-val"><span class="tm-stat-num">'+avgMin+'</span><span class="tm-stat-unit">min</span></div>',
+     icon:'<div class="tm-stat-icon" style="background:rgba(150,120,255,.12)"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(150,120,255,.85)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="5" y="2" width="14" height="20" rx="2"/><path d="M12 10v4l2 2"/></svg></div>'},
+    {title:'Continuous use',body:'<div class="tm-stat-val"><span class="tm-stat-num">'+contHr+'</span><span class="tm-stat-unit">hr</span>&nbsp;<span class="tm-stat-num2">'+contMin+'</span><span class="tm-stat-unit2">min</span></div><div class="tm-stat-range">'+contRange+'</div>',
+     icon:'<div class="tm-stat-icon" style="background:rgba(240,90,0,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(240,90,0,.75)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="9"/><path d="M12 7v5l3 3"/></svg></div>'},
+    {title:'Longest off-screen',body:'<div class="tm-stat-val"><span class="tm-stat-num">'+offHr+'</span><span class="tm-stat-unit">hr</span>&nbsp;<span class="tm-stat-num2">'+offMin+'</span><span class="tm-stat-unit2">min</span></div><div class="tm-stat-range">'+offRange+'</div>',
+     icon:'<div class="tm-stat-icon" style="background:rgba(234,179,8,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(234,179,8,.8)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg></div>'},
+    {title:'Last drop-off',body:'<div class="tm-stat-val"><span class="tm-stat-num" style="font-size:28px;color:rgba(150,120,255,.9)">'+lastDrop+'</span></div>',
+     icon:'<div class="tm-stat-icon" style="background:rgba(59,130,246,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(59,130,246,.8)" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 12.79A9 9 0 1111.21 3 7 7 0 0021 12.79z"/></svg></div>'},
+    {title:'First pickup',body:'<div class="tm-stat-val"><span class="tm-stat-num" style="font-size:28px;color:rgba(150,120,255,.9)">'+firstPick+'</span></div>',
+     icon:'<div class="tm-stat-icon" style="background:rgba(240,90,0,.1)"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(240,90,0,.75)" stroke-width="1.8" stroke-linecap="round"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg></div>'},
+  ];
+  document.getElementById('tm-stat-grid').innerHTML=stats.map(s=>'<div class="tm-stat"><div class="tm-stat-title">'+s.title+'</div>'+s.body+s.icon+'</div>').join('');
+  const mostApps=usageData.slice(0,5);
+  document.getElementById('tm-most-used').innerHTML='<div class="tm-app-card-title">Most used</div>'+mostApps.map(u=>'<div class="tm-app-row"><img class="tm-app-ico" src="'+logo(u.app.domain)+'" onerror="this.style.opacity=0.2"/><span class="tm-app-name">'+u.app.name+'</span><span class="tm-app-time">'+fmtHM(u.hours)+'</span></div>').join('');
+  // Notifications = count of pickups per app
+  const appPickupCounts = {};
+  filteredPickups.forEach(p => { appPickupCounts[p.appId] = (appPickupCounts[p.appId]||0) + 1; });
+  const notifApps = installedApps.map(app => ({ app, notifs: appPickupCounts[app.id]||0 })).sort((a,b) => b.notifs - a.notifs).slice(0,5);
+  document.getElementById('tm-notifs').innerHTML='<div class="tm-app-card-title">Notifications</div>'+notifApps.map(u=>'<div class="tm-app-row"><img class="tm-app-ico" src="'+logo(u.app.domain)+'" onerror="this.style.opacity=0.2"/><span class="tm-app-name">'+u.app.name+'</span><span class="tm-app-time">'+u.notifs+'x</span></div>').join('');
+}
+
+// ── SETTINGS ───────────────────────────────────────────────────────────────
+let _settingsPrevTab = null; // remember active tab to restore on close
+async function openSettings(){
+  _settingsPrevTab = S.activeTab || null;
+  // Close the native BrowserView layer and WAIT for it to be fully removed
+  if(window.electron) await window.electron.closeView();
+  buildSettings();
+  document.getElementById('sp').classList.add('open');
+  document.getElementById('sp-ov').classList.add('open');
+}
+function closeSettings(){
+  document.getElementById('sp').classList.remove('open');
+  document.getElementById('sp-ov').classList.remove('open');
+  // Restore the BrowserView if a tab was active before opening settings
+  if(_settingsPrevTab){
+    const tab = S.tabs.find(t => t.id === _settingsPrevTab);
+    if(tab){
+      const app = APPS.find(a => a.id === tab.appId) || S.apps.find(a => a.id === tab.appId);
+      if(app) showAppView(app);
+    }
+    _settingsPrevTab = null;
+  }
+}
+const SECTS=[
+  {id:'devices',lbl:'Devices',
+    ico:`<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`,
+    render:()=>{
+      const devs = _cachedDevices;
+      const devIcon = (p) => {
+        if(p==='mobile'||p==='ios'||p==='android') return `<svg viewBox="0 0 24 24"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`;
+        if(p==='tablet') return `<svg viewBox="0 0 24 24"><rect x="4" y="2" width="16" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>`;
+        return `<svg viewBox="0 0 24 24"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>`;
+      };
+      const timeAgo = (ts) => {
+        if(!ts) return 'Unknown';
+        const ms = Date.now() - new Date(ts+'Z').getTime();
+        if(ms < 60000) return 'Now';
+        if(ms < 3600000) return Math.floor(ms/60000)+'m ago';
+        if(ms < 86400000) return Math.floor(ms/3600000)+'h ago';
+        if(ms < 604800000) return Math.floor(ms/86400000)+'d ago';
+        return Math.floor(ms/604800000)+'w ago';
+      };
+      if(!devs.length) return `<div class="dev-r"><div class="dev-ico-w">${devIcon('web')}</div><div class="dev-i"><div class="dev-nm">This Device</div><div class="dev-mt">Desktop · Now</div></div><span class="badge-on">ACTIVE</span></div><div style="text-align:center;padding:8px;color:var(--w20);font-size:11px">Sign in to see all devices</div>`;
+      return devs.map(d=>`<div class="dev-r"><div class="dev-ico-w">${devIcon(d.platform)}</div><div class="dev-i"><div class="dev-nm">${d.name||'Unknown Device'}</div><div class="dev-mt">${(d.platform||'web').charAt(0).toUpperCase()+(d.platform||'web').slice(1)} · ${timeAgo(d.last_seen_at)}</div></div>${d.is_active?'<span class="badge-on">ACTIVE</span>':''}</div>`).join('');
+    }
+  },
+  {id:'sync',lbl:'Cloud Sync',
+    ico:`<svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>`,
+    render:()=>`
+      <div class="sub-r"><div><div class="sub-lbl">Auto-Sync Sessions</div><div class="sub-sub">Push token changes instantly</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="sub-r"><div><div class="sub-lbl">Sync on Login</div><div class="sub-sub">Pull state on new device</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="sub-r"><div><div class="sub-lbl">Background Refresh</div><div class="sub-sub">Auto-renew tokens before expiry</div></div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+      <button class="sp-btn" style="margin-top:6px" onclick="realSync()"><svg viewBox="0 0 24 24"><polyline points="23 4 23 10 17 10"/><path d="M20.49 15a9 9 0 11-2.12-9.36L23 10"/></svg>Sync All Devices Now</button>`
+  },
+  {id:'security',lbl:'Security',
+    ico:`<svg viewBox="0 0 24 24"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>`,
+    render:()=>`
+      <div class="score-c"><div class="score-v">A+</div><div class="score-l">Vault Security Score</div><div style="font-size:12px;color:var(--or);font-weight:500;margin-top:6px;letter-spacing:.03em">Nothing without you</div></div>
+      <div class="sub-r"><div><div class="sub-lbl">2FA on CLYX Login</div><div class="sub-sub">Protect master session</div></div><div class="tog on" onclick="this.classList.toggle('on')"></div></div>
+      <div class="sub-r"><div><div class="sub-lbl">Biometric Unlock</div><div class="sub-sub">Face ID / Fingerprint</div></div><div class="tog" onclick="this.classList.toggle('on')"></div></div>
+      <div class="sub-r"><div><div class="sub-lbl">AES-256 Vault</div><div class="sub-sub">Always on</div></div><div class="tog on" style="opacity:.4;pointer-events:none"></div></div>
+      <button class="sp-btn" style="margin-top:6px" onclick="toast('Key rotation initiated','i')"><svg viewBox="0 0 24 24"><path d="M21 2l-2 2m-7.61 7.61a5.5 5.5 0 11-7.778 7.778 5.5 5.5 0 017.777-7.777zm0 0L15.5 7.5m0 0l3 3L22 7l-3-3m-3.5 3.5L19 4"/></svg>Rotate Encryption Keys</button>
+      <button class="sp-btn" onclick="toast('Other sessions revoked','s')"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Revoke Other Devices</button>`
+  },
+  {id:'activity',lbl:'History',
+    ico:`<svg viewBox="0 0 24 24"><circle cx="12" cy="12" r="9"/><polyline points="12 7 12 12 15 15"/></svg>`,
+    render:()=>{
+      const devs = _cachedDevices;
+      const iconSvg={
+        connected:`<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round"><path d="M5 12.55a11 11 0 0114.08 0M1.42 9a16 16 0 0121.16 0M8.53 16.11a6 6 0 016.95 0M12 20h.01"/></svg>`,
+        installed:`<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>`,
+        removed:`<svg viewBox="0 0 24 24" fill="none" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"><polyline points="3 6 5 6 21 6"/><path d="M19 6l-1 14a2 2 0 01-2 2H8a2 2 0 01-2-2L5 6"/><path d="M10 11v6M14 11v6"/></svg>`,
+      };
+      const labelMap={connected:'Connected',installed:'Installed',removed:'Removed'};
+      const timeAgo = (ts) => {
+        if(!ts) return 'Unknown';
+        const ms = Date.now() - new Date(ts+'Z').getTime();
+        if(ms < 60000) return 'Just now';
+        if(ms < 3600000) return Math.floor(ms/60000)+'m ago';
+        if(ms < 86400000) return Math.floor(ms/3600000)+'h ago';
+        const days = Math.floor(ms/86400000);
+        if(days === 1) return 'Yesterday';
+        if(days < 7) return days+' days ago';
+        if(days < 30) return Math.floor(days/7)+' week'+(Math.floor(days/7)>1?'s':'')+' ago';
+        return Math.floor(days/30)+' month'+(Math.floor(days/30)>1?'s':'')+' ago';
+      };
+      if(!devs.length) return `<div style="text-align:center;padding:24px;color:var(--w20);font-size:12px">No device history available.<br>Sign in with the backend to see activity.</div>`;
+      // Build events from real device data
+      const devEvents = [];
+      devs.forEach(d => {
+        // Registration event
+        if(d.registered_at || d.created_at){
+          devEvents.push({ c: '#3b82f6', icon: 'installed', nm: d.name||'Unknown', sub: (d.platform||'web').charAt(0).toUpperCase()+(d.platform||'web').slice(1)+' · Device registered', ts: timeAgo(d.registered_at||d.created_at), time: new Date((d.registered_at||d.created_at)+'Z').getTime() });
+        }
+        // Last seen (as connected event) — only if different from registration
+        if(d.last_seen_at && d.last_seen_at !== (d.registered_at||d.created_at)){
+          devEvents.push({ c: d.is_active ? '#f05a00' : '#a855f7', icon: 'connected', nm: d.name||'Unknown', sub: (d.platform||'web').charAt(0).toUpperCase()+(d.platform||'web').slice(1)+' · '+(d.is_active?'Active session':'Last seen'), ts: timeAgo(d.last_seen_at), time: new Date(d.last_seen_at+'Z').getTime() });
+        }
+        // Inactive = removed-like event
+        if(!d.is_active){
+          devEvents.push({ c: '#ef4444', icon: 'removed', nm: d.name||'Unknown', sub: 'Device deactivated', ts: timeAgo(d.last_seen_at), time: new Date((d.last_seen_at||d.registered_at||d.created_at)+'Z').getTime() });
+        }
+      });
+      devEvents.sort((a,b) => b.time - a.time);
+      if(!devEvents.length) return `<div style="text-align:center;padding:24px;color:var(--w20);font-size:12px">No activity yet</div>`;
+      return devEvents.slice(0,8).map(e=>`
+        <div class="dev-hist-row">
+          <div class="dev-hist-icon" style="background:${e.c}18;border:1px solid ${e.c}30">
+            <svg viewBox="0 0 24 24" fill="none" stroke="${e.c}" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round">${iconSvg[e.icon].replace(/<svg[^>]*>/,'').replace('</svg>','')}</svg>
+          </div>
+          <div class="dev-hist-info">
+            <div class="dev-hist-nm">${e.nm}</div>
+            <div class="dev-hist-sub">${e.sub}</div>
+          </div>
+          <div style="display:flex;flex-direction:column;align-items:flex-end;gap:3px;flex-shrink:0">
+            <span class="dev-hist-badge" style="background:${e.c}18;color:${e.c};border:1px solid ${e.c}30">${labelMap[e.icon]}</span>
+            <span class="dev-hist-ts">${e.ts}</span>
+          </div>
+        </div>`).join('');
+    }
+  },
+  {id:'account',lbl:'Account',
+    ico:`<svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>`,
+    render:()=>`
+      <button class="sp-btn" onclick="toast('Profile settings — coming soon','i')"><svg viewBox="0 0 24 24"><circle cx="12" cy="8" r="4"/><path d="M4 20c0-4 3.6-7 8-7s8 3 8 7"/></svg>Edit Profile</button>
+      <button class="sp-btn" onclick="toast('Pro upgrade — coming soon','i')"><svg viewBox="0 0 24 24"><polygon points="12 2 15.09 8.26 22 9.27 17 14.14 18.18 21.02 12 17.77 5.82 21.02 7 14.14 2 9.27 8.91 8.26 12 2"/></svg>Upgrade to Pro</button>
+      <button class="sp-btn" onclick="toast('Export started — check email','i')"><svg viewBox="0 0 24 24"><path d="M21 15v4a2 2 0 01-2 2H5a2 2 0 01-2-2v-4M7 10l5 5 5-5M12 15V3"/></svg>Export Data</button>
+      <button class="sp-btn danger" onclick="doLogout()"><svg viewBox="0 0 24 24"><path d="M9 21H5a2 2 0 01-2-2V5a2 2 0 012-2h4M16 17l5-5-5-5M21 12H9"/></svg>Sign Out</button>`
+  },
+];
+function buildSettings(){
+  document.getElementById('sp-body').innerHTML=SECTS.map(s=>`
+    <div class="acc" id="acc-${s.id}">
+      <div class="acc-h" onclick="togAcc('${s.id}')">
+        <div class="acc-ico">${s.ico}</div>
+        <div class="acc-lbl">${s.lbl}</div>
+        <div class="acc-chev"><svg viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></svg></div>
+      </div>
+      <div class="acc-body" id="ab-${s.id}"><div class="acc-content">${s.render()}</div></div>
+    </div>`).join('');
+}
+function openAccordion(id){
+  openSettings();
+  setTimeout(()=>{ const acc=document.getElementById('acc-'+id); if(acc&&!acc.classList.contains('open')) togAcc(id); }, 150);
+}
+function togAcc(id){
+  const item=document.getElementById('acc-'+id);
+  const body=document.getElementById('ab-'+id);
+  const isOpen=item.classList.contains('open');
+  document.querySelectorAll('.acc').forEach(el=>{el.classList.remove('open');el.querySelector('.acc-body').style.height='0'});
+  if(!isOpen){item.classList.add('open');body.style.height=body.querySelector('.acc-content').scrollHeight+'px';}
+}
+
+// ── AVATAR MENU ────────────────────────────────────────────────────────────
+function toggleAvMenu(){
+  const m=document.getElementById('av-menu');const b=document.getElementById('av-btn');
+  if(m.classList.contains('open'))closeAvMenu();
+  else{m.classList.add('open');b.classList.add('open');}
+}
+function closeAvMenu(){
+  document.getElementById('av-menu').classList.remove('open');
+  document.getElementById('av-btn').classList.remove('open');
+}
+document.addEventListener('click',e=>{
+  const w=document.querySelector('.av-wrap');
+  if(w&&!w.contains(e.target))closeAvMenu();
+});
+
+// ── MISC ───────────────────────────────────────────────────────────────────
+// ── REAL SYNC & DEVICES ────────────────────────────────────────────────────
+let _cachedDevices = []; // cached device list from backend
+
+async function fetchDevices(){
+  const tok = localStorage.getItem('clyx_access_token');
+  if(!tok) { _cachedDevices = []; return []; }
+  try {
+    const r = await fetch(API_BASE+'/devices', { headers:{'Authorization':'Bearer '+tok} });
+    const d = await r.json();
+    if(d.success && d.devices) { _cachedDevices = d.devices; return d.devices; }
+  } catch(e) { /* backend offline */ }
+  return _cachedDevices;
+}
+
+async function realSync(){
+  toast('Syncing encrypted sessions…','i');
+  const tok = localStorage.getItem('clyx_access_token');
+  if(!tok){ toast('Sign in to sync','e'); return; }
+  try {
+    // Sync apps
+    const ar = await fetch(API_BASE+'/apps', { headers:{'Authorization':'Bearer '+tok} });
+    const ad = await ar.json();
+    if(ad.success && ad.apps && ad.apps.length){
+      S.apps = ad.apps.map(a=>({ id:a.app_id||a.appId, name:a.name, domain:a.domain||'', cat:a.category||'Other', auth:a.auth_type||'OAuth', color:'#f05a00' }));
+      save(); renderDash();
+    }
+    // Fetch devices
+    const devs = await fetchDevices();
+    updateDeviceUI(devs);
+    toast(S.apps.length+' apps synced across '+devs.length+' device'+(devs.length!==1?'s':''),'s');
+  } catch(e){
+    toast('Sync failed — backend offline','e');
+  }
+}
+
+function updateDeviceUI(devs){
+  // Update sync pill
+  const pillText = document.getElementById('sync-pill-text');
+  if(pillText) pillText.textContent = 'Cloud Synced · '+(devs.length||1)+' Device'+(devs.length!==1?'s':'');
+  // Update dashboard metric
+  const mDevs = document.getElementById('m-devs');
+  if(mDevs) mDevs.textContent = devs.length || 1;
+  // Update dashboard device sub-list
+  renderDashDeviceList(devs);
+}
+
+function renderDashDeviceList(devs){
+  const container = document.getElementById('metric-device-list');
+  if(!container) return;
+  if(!devs.length){
+    container.innerHTML = '<div class="metric-dev-item"><svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg><span>This Device</span><div class="mdev-dot active"></div></div>';
+    return;
+  }
+  const platformIcon = (p) => {
+    if(p==='mobile'||p==='ios'||p==='android') return '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-linecap="round"><rect x="5" y="2" width="14" height="20" rx="2"/><line x1="12" y1="18" x2="12.01" y2="18"/></svg>';
+    return '<svg viewBox="0 0 24 24" fill="none" stroke="rgba(255,255,255,.55)" stroke-width="1.6" stroke-linecap="round"><rect x="2" y="3" width="20" height="14" rx="2"/><line x1="8" y1="21" x2="16" y2="21"/><line x1="12" y1="17" x2="12" y2="21"/></svg>';
+  };
+  container.innerHTML = devs.slice(0,3).map(d=>
+    `<div class="metric-dev-item">${platformIcon(d.platform)}<span>${d.name||d.platform}</span><div class="mdev-dot${d.is_active?' active':''}"></div></div>`
+  ).join('') + (devs.length>3 ? `<div class="metric-dev-item"><span style="color:var(--w30);font-size:10px">+${devs.length-3} more</span></div>` : '');
+}
+function toast(msg,type='i'){
+  const c=document.getElementById('toasts');
+  const el=document.createElement('div');el.className=`toast ${type}`;
+  el.innerHTML=`<div class="tpip"></div><span>${msg}</span>`;
+  c.appendChild(el);
+  setTimeout(()=>{el.classList.add('out');setTimeout(()=>el.remove(),220)},2800);
+}
+function ripple(e){
+  const b=e.currentTarget;if(!b||!b.classList.contains('rh'))return;
+  const r=document.createElement('span');r.className='rp';
+  const rc=b.getBoundingClientRect();const s=Math.max(rc.width,rc.height)*2;
+  r.style.cssText=`width:${s}px;height:${s}px;left:${e.clientX-rc.left-s/2}px;top:${e.clientY-rc.top-s/2}px`;
+  b.appendChild(r);setTimeout(()=>r.remove(),500);
+}
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'){
+    if(!document.getElementById('vault-modal').classList.contains('gone')){closeVault();return;}
+    if(!document.getElementById('vault-dash').classList.contains('gone')){
+      if(_vaultAppActive){closeVaultApp();} else {lockVault();}
+      return;
+    }
+    if(!document.getElementById('timings-modal').classList.contains('gone')){closeTimings();return;}
+    if(!document.getElementById('modal').classList.contains('gone')){closeModal();return;}
+    if(document.getElementById('sp').classList.contains('open')){closeSettings();return;}
+    if(!document.getElementById('appview').classList.contains('gone'))goHome();
+  }
+  if((e.ctrlKey||e.metaKey)&&e.key==='k'){e.preventDefault();openModal();}
+});
+
+// ── THEME ─────────────────────────────────────────────────────────────────
+let currentTheme = localStorage.getItem('clyx_theme') || 'dark';
+function applyTheme(t){
+  document.body.classList.remove('theme-light','theme-dark');
+  if(t==='light') document.body.classList.add('theme-light');
+  else if(t==='system'){
+    const sysDark=window.matchMedia('(prefers-color-scheme: dark)').matches;
+    if(!sysDark) document.body.classList.add('theme-light');
+  }
+  ['dark','light','system'].forEach(id=>{
+    const el=document.getElementById('th-'+id);
+    if(el) el.classList.toggle('active', id===t);
+  });
+}
+function openTheme(){
+  document.getElementById('theme-modal').classList.remove('gone');
+  applyTheme(currentTheme);
+}
+function closeTheme(){document.getElementById('theme-modal').classList.add('gone');}
+function closeThemeMBg(e){if(e.target===e.currentTarget)closeTheme();}
+function setTheme(t){
+  currentTheme=t;
+  localStorage.setItem('clyx_theme',t);
+  applyTheme(t);
+  toast(t==='dark'?'Dark mode on':t==='light'?'Light mode on':'Following system theme','i');
+}
+// Apply on load — default dark
+applyTheme(currentTheme);
+
+// ── AVATAR COLOR CYCLE ─────────────────────────────────────────────────────
+const AV_COLORS=['#f05a00','#a855f7','#3b82f6','#22c55e','#ef4444','#eab308','#06b6d4'];
+let avColorIdx=0;
+function cycleAvColor(){
+  avColorIdx=(avColorIdx+1)%AV_COLORS.length;
+  const c=AV_COLORS[avColorIdx];
+  ['av-btn','av-pic'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.background=c;});
+  document.getElementById('av-btn').style.background=c;
+  localStorage.setItem('clyx_avcolor',avColorIdx);
+  toast('Avatar color updated','i');
+}
+// Restore saved av color
+(function(){
+  const saved=localStorage.getItem('clyx_avcolor');
+  if(saved!==null){
+    avColorIdx=parseInt(saved);
+    const c=AV_COLORS[avColorIdx%AV_COLORS.length];
+    ['av-btn','av-pic'].forEach(id=>{const el=document.getElementById(id);if(el)el.style.background=c;});
+  }
+})();
+
+
+// ── OPEN APP HELPERS ─────────────────────────────────────────────────────────
+function openAppURL(url, appName){
+  if(!url||url==='https://'||url==='https://undefined'){toast(appName+' is a built-in CLYX app','i');return;}
+  window.open(url,'_blank');
+}
+function openClyxPopup(url){ window.open(url,'_blank'); }
+function copyToClip(t){ navigator.clipboard.writeText(t).then(()=>toast('URL copied','i')); }
+function iabBack(){}function iabForward(){}function iabReload(){}
+function closeInAppBrowser(){ const o=document.getElementById('iab-overlay'); if(o)o.remove(); }
+
+
+// ── BACKEND SYNC ──────────────────────────────────────────────────────────────
+async function syncAppsFromServer() {
+  const token = localStorage.getItem('clyx_token');
+  if (!token) return;
+  try {
+    const r = await fetch(API_BASE+'/apps', { headers: { Authorization: 'Bearer '+token } });
+    const d = await r.json();
+    if (d.ok && d.apps?.length) {
+      // Merge server apps with local APPS list
+      d.apps.forEach((sa) => {
+        const found = APPS.find((a) => a.id === sa.app_id);
+        if (found && !S.apps.find((a) => a.id === sa.app_id)) {
+          S.apps.push(found);
+        }
+      });
+      save(); renderDash(); renderTabs();
+    }
+  } catch(e) { /* backend offline, that's ok */ }
+}
+
+async function saveAppToServer(appId, name, domain) {
+  const token = localStorage.getItem('clyx_token');
+  if (!token) return;
+  fetch(API_BASE+'/apps', {
+    method: 'POST',
+    headers: { 'Content-Type':'application/json', Authorization:'Bearer '+token },
+    body: JSON.stringify({ appId, name, domain })
+  }).catch(() => {});
+}
+
+
+// ── PROFILE MODAL ─────────────────────────────────────────────────────────────
+function openProfile(){
+  const modal = document.getElementById('profile-modal');
+  if(!modal) return;
+  // Populate fields from current state
+  document.getElementById('pm-name-input').value  = S.user.name  || '';
+  document.getElementById('pm-email-input').value = S.user.email || '';
+  document.getElementById('pm-pass-input').value  = '';
+  document.getElementById('pm-display-name').textContent  = S.user.name  || 'User';
+  document.getElementById('pm-display-email').textContent = S.user.email || '';
+  document.getElementById('pm-stat-apps').textContent = S.apps.length || 0;
+  // Real device count from cached data or fetch
+  document.getElementById('pm-stat-devs').textContent = _cachedDevices.length || 1;
+  fetchDevices().then(devs => { document.getElementById('pm-stat-devs').textContent = devs.length || 1; });
+  const days = Math.max(1, Math.floor((Date.now() - (S.user.joinedAt||Date.now())) / 86400000));
+  document.getElementById('pm-stat-days').textContent = days;
+  // Restore avatar
+  const avPrev = document.getElementById('pm-avatar-preview');
+  const savedImg = localStorage.getItem('clyx_avatar_img');
+  if(savedImg){
+    avPrev.innerHTML = `<img src="${savedImg}" alt="avatar"/>`;
+  } else {
+    avPrev.textContent = (S.user.name||'A')[0].toUpperCase();
+    avPrev.style.background = S.user.avatarColor || '#f05a00';
+  }
+  modal.classList.remove('gone');
+}
+function closeProfile(){ document.getElementById('profile-modal').classList.add('gone'); }
+function closePMBg(e){ if(e.target===e.currentTarget) closeProfile(); }
+
+function triggerAvatarUpload(){
+  document.getElementById('avatar-file-input').click();
+}
+
+function handleAvatarUpload(input){
+  const file = input.files[0];
+  if(!file) return;
+  const reader = new FileReader();
+  reader.onload = (e) => {
+    const dataUrl = e.target.result;
+    localStorage.setItem('clyx_avatar_img', dataUrl);
+    // Update all avatar elements
+    const avPrev = document.getElementById('pm-avatar-preview');
+    avPrev.innerHTML = `<img src="${dataUrl}" alt="avatar"/>`;
+    // Update topbar avatar button
+    const avBtn = document.getElementById('av-btn');
+    const avPic = document.getElementById('av-pic');
+    if(avBtn){ avBtn.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`; }
+    if(avPic){ avPic.innerHTML = `<img src="${dataUrl}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>`; }
+    toast('Profile photo updated', 's');
+  };
+  reader.readAsDataURL(file);
+}
+
+function removeAvatar(){
+  localStorage.removeItem('clyx_avatar_img');
+  const initial = (S.user.name||'A')[0].toUpperCase();
+  const color = S.user.avatarColor || '#f05a00';
+  document.getElementById('pm-avatar-preview').innerHTML = initial;
+  document.getElementById('pm-avatar-preview').style.background = color;
+  const avBtn = document.getElementById('av-btn');
+  const avPic = document.getElementById('av-pic');
+  if(avBtn){ avBtn.textContent = initial; avBtn.style.background = color; }
+  if(avPic){ avPic.textContent = initial; avPic.style.background = color; }
+  toast('Profile photo removed', 'i');
+}
+
+function saveProfile(){
+  const name  = document.getElementById('pm-name-input').value.trim();
+  const email = document.getElementById('pm-email-input').value.trim();
+  if(!name){ toast('Name cannot be empty','e'); return; }
+  S.user.name  = name;
+  S.user.email = email;
+  save();
+  // Update ALL instances in UI
+  const initial  = name[0].toUpperCase();
+  const savedImg = localStorage.getItem('clyx_avatar_img');
+  const imgTag   = savedImg ? `<img src="${savedImg}" style="width:100%;height:100%;object-fit:cover;border-radius:50%"/>` : null;
+  ['av-btn','av-pic'].forEach(id=>{
+    const el = document.getElementById(id);
+    if(!el) return;
+    if(imgTag) el.innerHTML = imgTag;
+    else { el.textContent = initial; el.style.background = S.user.avatarColor||'#f05a00'; }
+  });
+  document.getElementById('uname').textContent = name.split(' ')[0];
+  document.getElementById('av-name').textContent  = name;
+  document.getElementById('av-email').textContent = email;
+  document.getElementById('pm-display-name').textContent  = name;
+  document.getElementById('pm-display-email').textContent = email;
+  // Sync to backend
+  const tok = localStorage.getItem('clyx_access_token');
+  if(tok){
+    fetch(API_BASE+'/user/profile',{ method:'PATCH',
+      headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},
+      body: JSON.stringify({ name, avatarColor: S.user.avatarColor })
+    }).catch(()=>{});
+  }
+  toast('Profile saved ✓','s');
+  closeProfile();
+}
+
+// Restore avatar image on load
+// Avatar restore handled in enter()
+
+// ── SECRET VAULT ──────────────────────────────────────────────────────────────
+const VAULT_PIN_KEY    = 'clyx_vault_pin';
+const VAULT_APPS_KEY   = 'clyx_vault_apps';
+let vaultInput         = '';
+let vaultMode          = 'unlock';   // 'unlock' | 'setpin' | 'confirmpin'
+let vaultSetFirst      = '';
+let vaultUnlocked      = false;
+
+function openVault(){
+  vaultInput = ''; vaultSetFirst = '';
+  const hasPin = !!localStorage.getItem(VAULT_PIN_KEY);
+  vaultMode = hasPin ? 'unlock' : 'setpin';
+  // Update title based on mode
+  document.querySelector('.vault-title').textContent =
+    hasPin ? 'Secret Vault' : 'Set Up Secret Vault';
+  document.getElementById('vault-sub-text').textContent =
+    hasPin ? 'Enter your 4-digit PIN to access hidden apps'
+           : 'Create a 4-digit PIN to secure your secret vault';
+  const changeLink = document.getElementById('vault-change-link');
+  if(hasPin){
+    changeLink.textContent = 'Forgot PIN? Reset vault';
+    changeLink.style.display = '';
+    changeLink.onclick = openSetPin;
+  } else {
+    // Hide reset link on first-time setup — it's confusing
+    changeLink.style.display = 'none';
+  }
+  document.getElementById('vault-error').textContent = '';
+  updateVaultDots();
+  document.getElementById('vault-modal').classList.remove('gone');
+}
+
+function closeVault(){ document.getElementById('vault-modal').classList.add('gone'); vaultInput=''; }
+function closeVaultBg(e){ if(e.target===e.currentTarget) closeVault(); }
+
+function openSetPin(){
+  vaultMode='setpin'; vaultInput=''; vaultSetFirst='';
+  document.getElementById('vault-sub-text').textContent='Choose a new 4-digit PIN';
+  document.getElementById('vault-error').textContent='';
+  updateVaultDots();
+}
+
+function vaultKey(k){
+  if(vaultInput.length >= 4) return;
+  vaultInput += k;
+  updateVaultDots();
+  document.getElementById('vault-error').textContent='';
+  if(vaultInput.length === 4) setTimeout(checkVaultPin, 300);
+}
+function vaultBack(){ vaultInput=vaultInput.slice(0,-1); updateVaultDots(); }
+function vaultClear(){ vaultInput=''; updateVaultDots(); }
+
+function updateVaultDots(){
+  for(let i=0;i<4;i++){
+    const d = document.getElementById('vd'+i);
+    if(d) d.classList.toggle('filled', i < vaultInput.length);
+  }
+}
+
+function checkVaultPin(){
+  if(vaultMode==='unlock'){
+    const saved = localStorage.getItem(VAULT_PIN_KEY);
+    if(vaultInput === saved){
+      vaultUnlocked=true;
+      closeVault();
+      showSecretApps();
+      toast('Secret Vault unlocked 🔓','s');
+    } else {
+      document.getElementById('vault-error').textContent='Wrong PIN. Try again.';
+      vaultInput=''; updateVaultDots();
+      // Shake animation
+      const card=document.querySelector('.vault-card');
+      card.style.animation='none';
+      setTimeout(()=>{ card.style.animation=''; },50);
+    }
+  } else if(vaultMode==='setpin'){
+    vaultSetFirst=vaultInput; vaultInput='';
+    vaultMode='confirmpin';
+    document.querySelector('.vault-title').textContent = 'Confirm PIN';
+    document.getElementById('vault-sub-text').textContent='Re-enter your PIN to confirm';
+    updateVaultDots();
+  } else if(vaultMode==='confirmpin'){
+    if(vaultInput===vaultSetFirst){
+      localStorage.setItem(VAULT_PIN_KEY, vaultInput);
+      vaultUnlocked=true;
+      document.querySelector('.vault-title').textContent = 'Secret Vault';
+      closeVault();
+      showSecretApps();
+      toast('Secret Vault PIN set ✓','s');
+    } else {
+      document.getElementById('vault-error').textContent="PINs don't match. Try again.";
+      vaultInput=''; vaultMode='setpin'; vaultSetFirst='';
+      document.querySelector('.vault-title').textContent = 'Set Up Secret Vault';
+      document.getElementById('vault-sub-text').textContent='Choose a new 4-digit PIN';
+      updateVaultDots();
+    }
+  }
+}
+
+let _vaultAppActive = false; // is a vault app currently open in BrowserView?
+
+function showSecretApps(){
+  // Close any open regular app first
+  if(window.electron) window.electron.closeView();
+  // Hide main app UI
+  document.getElementById('app').style.display = 'none';
+  // Show vault dashboard
+  document.getElementById('vault-dash').classList.remove('gone');
+  renderVaultDash();
+}
+
+function renderVaultDash(){
+  const vaultApps = JSON.parse(localStorage.getItem(VAULT_APPS_KEY)||'[]');
+  const body = document.getElementById('vd-body');
+  body.innerHTML = `
+    <div class="vd-hint">
+      <svg viewBox="0 0 24 24"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg>
+      <span>You are in <strong style="color:var(--or)">Incognito Mode</strong>. Apps opened here are not tracked in Screen Time or visible in the main app.</span>
+    </div>
+    <div class="vd-section-title">Your Secret Apps</div>
+    <div class="vd-apps-grid" id="vd-apps-grid"></div>
+    <div class="vd-add-section">
+      <div class="vd-section-title" style="margin-top:16px">Add App to Vault</div>
+      <div class="vd-add-row">
+        <select class="vd-add-select" id="vd-add-select">
+          <option value="">— Choose an app —</option>
+          ${APPS.filter(a => !vaultApps.includes(a.id)).map(a => `<option value="${a.id}">${a.name}</option>`).join('')}
+        </select>
+        <button class="vd-add-btn" onclick="addToVault()">+ Add</button>
+      </div>
+    </div>
+  `;
+  const grid = document.getElementById('vd-apps-grid');
+  if(vaultApps.length === 0){
+    grid.innerHTML = '<div class="vd-empty"><svg viewBox="0 0 24 24" width="32" height="32" fill="none" stroke="var(--w20)" stroke-width="1.5" stroke-linecap="round" style="margin-bottom:8px"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg><br>No secret apps yet.<br>Add apps below to use them in incognito mode.</div>';
+  } else {
+    vaultApps.forEach(appId => {
+      const app = APPS.find(a => a.id === appId);
+      if(!app) return;
+      const card = document.createElement('div');
+      card.className = 'acard rh';
+      card.onclick = (e) => { if(e.target.tagName !== 'BUTTON' && !e.target.closest('.acard-rm')){ ripple(e); openVaultApp(app); } };
+      card.innerHTML = `
+        <div class="acard-logo"><img src="${logo(app.domain)}" alt="${app.name}" onerror="this.style.opacity='.25'"/></div>
+        <div class="acard-name">${app.name}</div>
+        <button class="acard-rm" onclick="removeFromVault('${app.id}',event)" style="opacity:1">
+          <svg viewBox="0 0 24 24" fill="none" stroke-width="2.5" stroke-linecap="round"><path d="M18 6L6 18M6 6l12 12"/></svg>
+        </button>`;
+      grid.appendChild(card);
+    });
+  }
+}
+
+async function openVaultApp(app){
+  _vaultAppActive = true;
+  const appUrl = app.domain ? 'https://' + app.domain : '';
+  if(!appUrl){ toast('No URL for ' + app.name, 'e'); return; }
+
+  // Replace vault body with app view
+  const body = document.getElementById('vd-body');
+  body.innerHTML = `
+    <div style="display:flex;flex-direction:column;height:100%;margin:-32px -36px;">
+      <div class="vd-nav">
+        <button class="navb" onclick="closeVaultApp()"><svg width="11" height="11" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round"><path d="M19 12H5M12 19l-7-7 7-7"/></svg></button>
+        <button class="navb" onclick="if(window.electron)window.electron.navBack()">←</button>
+        <button class="navb" onclick="if(window.electron)window.electron.navForward()">→</button>
+        <div class="url-bar" style="flex:1">
+          <svg viewBox="0 0 24 24" fill="none" stroke-linecap="round" stroke-width="1.8" style="width:10px;height:10px;stroke:var(--or)"><rect x="3" y="11" width="18" height="11" rx="2"/><path d="M7 11V7a5 5 0 0110 0v4"/></svg>
+          <span id="vd-url-txt">${appUrl}</span>
+        </div>
+        <button class="navb" onclick="if(window.electron)window.electron.navReload()">↻</button>
+        <div class="vd-nav-badge">🔒 Incognito</div>
+      </div>
+      <div class="vd-app-body">
+        <div class="app-mock" id="vd-app-loading">
+          <div class="am-logo"><img src="${logo(app.domain)}" onerror="this.style.opacity=0.2"/></div>
+          <div class="am-name">${app.name}</div>
+          <div class="am-badge" style="background:rgba(240,90,0,.1);border-color:rgba(240,90,0,.25)">🔒 Incognito · Not Tracked</div>
+          <div class="am-spinner" style="margin-top:8px"></div>
+        </div>
+      </div>
+    </div>
+  `;
+
+  // Open in BrowserView (Electron)
+  if(window.electron && appUrl){
+    // Calculate topbar height: vault topbar + vault nav
+    const vdTopbar = document.querySelector('.vd-topbar');
+    const vdNav = document.querySelector('.vd-nav');
+    const tbH = vdTopbar ? vdTopbar.getBoundingClientRect().height : 52;
+    const navH = vdNav ? vdNav.getBoundingClientRect().height : 40;
+    const totalH = Math.round(tbH + navH);
+    if(window.electron.setTopbar) window.electron.setTopbar(totalH);
+    await window.electron.openURL(appUrl, totalH);
+    const loadEl = document.getElementById('vd-app-loading');
+    if(loadEl) loadEl.style.visibility = 'hidden';
+    window.electron.onNavUrl(u => {
+      const urlEl = document.getElementById('vd-url-txt');
+      if(urlEl) urlEl.textContent = u;
+    });
+  }
+}
+
+async function closeVaultApp(){
+  _vaultAppActive = false;
+  if(window.electron) await window.electron.closeView();
+  renderVaultDash();
+}
+
+async function lockVault(){
+  _vaultAppActive = false;
+  vaultUnlocked = false;
+  if(window.electron) await window.electron.closeView();
+  document.getElementById('vault-dash').classList.add('gone');
+  document.getElementById('app').style.display = '';
+  toast('Vault locked 🔒', 'i');
+}
+
+function addToVault(){
+  const sel = document.getElementById('vd-add-select') || document.getElementById('secret-app-select');
+  if(!sel || !sel.value) return;
+  const apps = JSON.parse(localStorage.getItem(VAULT_APPS_KEY)||'[]');
+  if(!apps.includes(sel.value)){
+    apps.push(sel.value);
+    localStorage.setItem(VAULT_APPS_KEY, JSON.stringify(apps));
+    toast('App added to secret vault', 's');
+    renderVaultDash();
+  }
+}
+
+function removeFromVault(id, e){
+  e.stopPropagation();
+  const apps = JSON.parse(localStorage.getItem(VAULT_APPS_KEY)||'[]').filter(a => a !== id);
+  localStorage.setItem(VAULT_APPS_KEY, JSON.stringify(apps));
+  toast('App removed from vault', 'i');
+  renderVaultDash();
+}
+
+// Lock vault when CLYX is closed/hidden
+document.addEventListener('visibilitychange', () => {
+  if(document.hidden){
+    if(vaultUnlocked) lockVault();
+    vaultUnlocked = false;
+  }
+});
+
+
+// ── API HELPERS ───────────────────────────────────────────────────────────────
+async function apiGet(path) {
+  const tok = localStorage.getItem('clyx_access_token');
+  const r   = await fetch(API_BASE + path, { headers:{ 'Authorization':'Bearer '+tok } });
+  if(r.status===401) { await refreshAccessToken(); return apiGet(path); }
+  return r.json();
+}
+async function apiPost(path, body) {
+  const tok = localStorage.getItem('clyx_access_token');
+  const r   = await fetch(API_BASE + path, { method:'POST',
+    headers:{'Content-Type':'application/json','Authorization':'Bearer '+tok},
+    body: JSON.stringify(body)
+  });
+  if(r.status===401) { await refreshAccessToken(); return apiPost(path, body); }
+  return r.json();
+}
+async function refreshAccessToken() {
+  const rt = localStorage.getItem('clyx_refresh_token');
+  if(!rt) return;
+  const r  = await fetch(API_BASE+'/auth/refresh',{method:'POST',
+    headers:{'Content-Type':'application/json'},body:JSON.stringify({refreshToken:rt})});
+  const d  = await r.json();
+  if(d.accessToken) localStorage.setItem('clyx_access_token', d.accessToken);
+  if(d.refreshToken)localStorage.setItem('clyx_refresh_token',d.refreshToken);
+}
+
+// ── SIGN-IN HINT (system browser flow) ────────────────────────────────────────
+// When an embedded/launched app needs login, sign-in happens for real in the
+// user's system browser. This bar just lets the user tell CLYX "I'm done" so
+// the embedded view refreshes — CLYX never imports or injects cookies.
+function showSigninHint(msg) {
+  let bar = document.getElementById('signin-hint-bar');
+  if(!bar) {
+    bar = document.createElement('div');
+    bar.id = 'signin-hint-bar';
+    bar.className = 'signin-hint-bar';
+    bar.innerHTML = `
+      <span id="signin-hint-text"></span>
+      <button class="shb-btn" id="signin-done-btn" onclick="confirmExternalSignin()">✓ I've signed in</button>
+      <button class="shb-btn ghost" onclick="this.parentElement.classList.add('gone')" style="padding:7px 10px;font-size:10px">✕</button>
+    `;
+    document.body.appendChild(bar);
+  }
+  if(msg) document.getElementById('signin-hint-text').textContent = msg;
+  bar.classList.remove('gone');
+}
+
+function confirmExternalSignin() {
+  const bar = document.getElementById('signin-hint-bar');
+  if(bar) bar.classList.add('gone');
+  if(window.electron?.confirmSignin) {
+    window.electron.confirmSignin();
+    toast('Refreshing…','i');
+  }
+}
+
+
+// ── ATOM LOGO ANIMATION ───────────────────────────────────────────────────────
+// Drives all three atom instances with JS rAF — particles stay on ellipse axes,
+// clipPath r=44 prevents any bleed outside, depth-based opacity gives 3D illusion
+function initAtoms(){
+  const PI=Math.PI, cos=Math.cos, sin=Math.sin;
+  const rx=38, ry=14, cx=50, cy=50;
+  const angles=[0,60,120].map(a=>a*PI/180);
+  // [speed rad/frame, initial phase rad]
+  const cfg=[[0.018,0],[0.023,-0.7],[0.014,-1.4]];
+
+  const instances=[
+    {pre:'ac-ld', ts:[...cfg.map(c=>[...c])]},
+    {pre:'ac-au', ts:[...cfg.map(c=>[...c])]},
+    {pre:'ac-tb', ts:[...cfg.map(c=>[...c])]},
+  ].map(inst=>({
+    particles: inst.ts.map((c,i)=>({
+      el: document.getElementById(inst.pre+'-p'+i),
+      speed: c[0],
+      t: c[1],
+      angle: angles[i]
+    }))
+  }));
+
+  function tick(){
+    instances.forEach(inst=>{
+      inst.particles.forEach(p=>{
+        if(!p.el) return;
+        p.t += p.speed;
+        const lx = rx*cos(p.t);
+        const ly = ry*sin(p.t);
+        const ca=cos(p.angle), sa=sin(p.angle);
+        const wx = cx + lx*ca - ly*sa;
+        const wy = cy + lx*sa + ly*ca;
+        p.el.setAttribute('cx', wx.toFixed(2));
+        p.el.setAttribute('cy', wy.toFixed(2));
+        // depth: ly>0 = front half (bottom of ellipse = closer to viewer)
+        // ly<0 = back half (top of ellipse = farther)
+        const depth = (sin(p.t)+1)*0.5; // 0=back, 1=front
+        p.el.setAttribute('opacity', Math.max(0.18, depth*0.82+0.18).toFixed(2));
+      });
+    });
+    requestAnimationFrame(tick);
+  }
+  tick();
+}
+initAtoms();
+</script>
+</body>
+</html>
